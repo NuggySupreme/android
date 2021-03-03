@@ -85,34 +85,34 @@ public class MinesweeperView extends View {
 
                 if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.MINE) {
                     // draws bomb
-                    canvas.drawBitmap(bombBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(bombBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.ONE) {
-                    canvas.drawBitmap(oneBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(oneBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.TWO) {
-                    canvas.drawBitmap(twoBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(twoBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.THREE) {
-                    canvas.drawBitmap(threeBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(threeBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.FOUR) {
-                    canvas.drawBitmap(fourBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(fourBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.FIVE) {
-                    canvas.drawBitmap(fiveBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(fiveBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.SIX) {
-                    canvas.drawBitmap(sixBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(sixBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.SEVEN) {
-                    canvas.drawBitmap(sevenBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(sevenBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.EIGHT) {
-                    canvas.drawBitmap(eightBitmap, centerX, centerY, paintBomb);
+                    canvas.drawBitmap(eightBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
                 else if(MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.EMPTY) {
-                    canvas.drawCircle(centerX, centerY, 0.1f, paintLine);
+                    canvas.drawBitmap(emptyBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
                 }
             }
         }
@@ -190,10 +190,18 @@ public class MinesweeperView extends View {
     }
 
     private void handleCoverTouch(int tX, int tY) {
-        if (tX < 5 && tY < 5 &&
-                MinesweeperModel.getInstance().getCoverContent(tX, tY) == MinesweeperModel.UNTOUCHED &&
-                MinesweeperModel.getInstance().getActionType() == MinesweeperModel.REVEAL) {
-            MinesweeperModel.getInstance().setCoverContent( tX, tY, MinesweeperModel.getInstance().getTouched() );
+        MinesweeperModel model = MinesweeperModel.getInstance();
+        if (tX < 5 && tY < 5 && model.getCoverContent(tX, tY) == MinesweeperModel.UNTOUCHED && model.getActionType() == MinesweeperModel.REVEAL) {
+            model.setCoverContent( tX, tY, MinesweeperModel.getInstance().getTouched() );
+            if(model.getFieldContent(tX, tY) == MinesweeperModel.EMPTY) {
+                for(int i = -1; i <= 1; i++) {
+                    for(int j = -1; j <= 1; j++) {
+                        if(tX + i >= 0 && tX + i < 5 && tY + j >= 0 && tY + j < 5) {
+                            handleCoverTouch(tX + i, tY + j);
+                        }
+                    }
+                }
+            }
         }
         else if (tX < 5 && tY < 5 &&
                 MinesweeperModel.getInstance().getCoverContent(tX, tY) == MinesweeperModel.UNTOUCHED &&
@@ -207,23 +215,23 @@ public class MinesweeperView extends View {
         canvas.drawRect(0, 0, getWidth(), getHeight(), paintBg);
 
         // four horizontal lines
-        canvas.drawLine(0, getHeight() / 5, getWidth(), getHeight() / 5,
+        canvas.drawLine(0, getHeight() / 5.0f, getWidth(), getHeight() / 5.0f,
                 paintLine);
-        canvas.drawLine(0, 2 * getHeight() / 5, getWidth(),
-                2 * getHeight() / 5, paintLine);
-        canvas.drawLine(0, 3 * getHeight() / 5, getWidth(),
-                3 * getHeight() / 5, paintLine);
-        canvas.drawLine(0, 4 * getHeight() / 5, getWidth(),
-                4 * getHeight() / 5, paintLine);
+        canvas.drawLine(0, 2 * getHeight() / 5.0f, getWidth(),
+                2 * getHeight() / 5.0f, paintLine);
+        canvas.drawLine(0, 3 * getHeight() / 5.0f, getWidth(),
+                3 * getHeight() / 5.0f, paintLine);
+        canvas.drawLine(0, 4 * getHeight() / 5.0f, getWidth(),
+                4.0f * getHeight() / 5, paintLine);
 
         // four vertical lines
-        canvas.drawLine(getWidth() / 5, 0, getWidth() / 5, getHeight(),
+        canvas.drawLine(getWidth() / 5.0f, 0, getWidth() / 5.0f, getHeight(),
                 paintLine);
-        canvas.drawLine(2 * getWidth() / 5, 0, 2 * getWidth() / 5, getHeight(),
+        canvas.drawLine(2.0f * getWidth() / 5, 0, 2.0f * getWidth() / 5, getHeight(),
                 paintLine);
-        canvas.drawLine(3 * getWidth() / 5, 0, 3 * getWidth() / 5, getHeight(),
+        canvas.drawLine(3.0f * getWidth() / 5, 0, 3.0f * getWidth() / 5, getHeight(),
                 paintLine);
-        canvas.drawLine(4 * getWidth() / 5, 0, 4 * getWidth() / 5, getHeight(),
+        canvas.drawLine(4.0f * getWidth() / 5, 0, 4.0f * getWidth() / 5, getHeight(),
                 paintLine);
     }
 
@@ -238,9 +246,6 @@ public class MinesweeperView extends View {
             ((MainActivity) getContext()).showSnackBarWithDelete(
                     "Oh no! You lost!");
             gameEnd = true;
-        }
-        else if (!(MinesweeperModel.getInstance().checkAllTiles()) && !(MinesweeperModel.getInstance().gameLost())) {
-
         }
     }
 }

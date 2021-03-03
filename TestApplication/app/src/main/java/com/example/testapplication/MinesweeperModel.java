@@ -84,9 +84,7 @@ public class MinesweeperModel {
         return cover[x][y] = content;
     }
 
-    public short getTouched() {
-        return TOUCHED;
-    }
+    public short getTouched() { return TOUCHED; }
 
     public short getFlagged() {
         return FLAG;
@@ -109,7 +107,7 @@ public class MinesweeperModel {
     public void setMines() {
         for(int i = 0; i < 5; i++) {
             for(int j = 0; j < 5; j++) {
-                if(rand.nextInt(5) == 1) {
+                if(rand.nextInt(4) == 1) {
                     model[i][j] = MINE;
                     Log.i("MODEL_TAG", "Model[" + i + "][" + j + "] has a mine!");
 
