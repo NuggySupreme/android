@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class MinesweeperModel {
     private static MinesweeperModel instance = null;
-    private static final int mine_prob = 3;
+    private static int difficulty = 5;
 
     Random rand = new Random();
 
@@ -76,12 +76,8 @@ public class MinesweeperModel {
         return cover[x][y];
     }
 
-    public short setFieldContent(int x, int y, short content) {
-        return model[x][y] = content;
-    }
-
-    public short setCoverContent(int x, int y, short content) {
-        return cover[x][y] = content;
+    public void setCoverContent(int x, int y, short content) {
+        cover[x][y] = content;
     }
 
     public short getTouched() { return TOUCHED; }
@@ -107,7 +103,7 @@ public class MinesweeperModel {
     public void setMines() {
         for(int i = 0; i < 5; i++) {
             for(int j = 0; j < 5; j++) {
-                if(rand.nextInt(4) == 1) {
+                if(rand.nextInt(difficulty) == 1) {
                     model[i][j] = MINE;
                     Log.i("MODEL_TAG", "Model[" + i + "][" + j + "] has a mine!");
 
@@ -232,5 +228,9 @@ public class MinesweeperModel {
             default:
                 return EMPTY;
         }
+    }
+
+    public static void setDifficulty(int newDifficulty) {
+        difficulty = newDifficulty;
     }
 }

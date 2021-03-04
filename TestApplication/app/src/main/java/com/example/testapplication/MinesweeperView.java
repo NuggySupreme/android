@@ -85,34 +85,34 @@ public class MinesweeperView extends View {
 
                 if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.MINE) {
                     // draws bomb
-                    canvas.drawBitmap(bombBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(bombBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.ONE) {
-                    canvas.drawBitmap(oneBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(oneBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.TWO) {
-                    canvas.drawBitmap(twoBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(twoBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.THREE) {
-                    canvas.drawBitmap(threeBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(threeBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.FOUR) {
-                    canvas.drawBitmap(fourBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(fourBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.FIVE) {
-                    canvas.drawBitmap(fiveBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(fiveBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.SIX) {
-                    canvas.drawBitmap(sixBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(sixBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.SEVEN) {
-                    canvas.drawBitmap(sevenBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(sevenBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if (MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.EIGHT) {
-                    canvas.drawBitmap(eightBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(eightBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
                 else if(MinesweeperModel.getInstance().getFieldContent(i, j) == MinesweeperModel.EMPTY) {
-                    canvas.drawBitmap(emptyBitmap, centerX + 0.1f, centerY + 0.1f, paintBomb);
+                    canvas.drawBitmap(emptyBitmap, centerX + 0.4f, centerY + 0.4f, paintBomb);
                 }
             }
         }

@@ -2,4 +2,14 @@
     <string name="app_name">Minesweeper</string>
     <string name="timer_words">Timer:</string>
     <string name="bomb_count_words">Bomb Count:</string>
+    <string name="flag">FLAG</string>
+    <string name="Flag">FLAG</string>
+    <string name="Restart">Restart</string>
+    <string name="Difficulty">Difficulty</string>
+    <string name="easy">Easy</string>
+    <string name="medium">Medium</string>
+    <string name="hard">Hard</string>
+    <string name="reveal">REVEAL</string>
+    <string name="blank">Blank</string>
+    <string name="expert">Expert</string>
 </resources>
