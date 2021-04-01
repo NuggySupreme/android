@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">ResearchRobot</string>
-    <string name="etIP_hint">Robot IP</string>
-    <string name="etPort_hint">Port No</string>
-    <string name="btnConnect_hint">Connect to Robot</string>
+    <string name="etIP_hint">Enter Robot IP</string>
+    <string name="btnConnect_text">Connect To Server</string>
     <string name="etMessage_hint">Enter Message</string>
-    <string name="btnSend_hint">Send to Robot</string>
+    <string name="btnSend_text">SEND</string>
 </resources>

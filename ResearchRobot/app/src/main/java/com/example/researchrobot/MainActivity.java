@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             if(!robotConnection.isConnected()) { //if there isn't already a connection to the robot
                 try {
-                    robotConnection = new Socket(SERVER_IP, R.integer.serverPort); //Send connection request to robot
+                    robotConnection = new Socket(SERVER_IP, R.integer.SERVER_PORT); //Send connection request to robot
                     toRobot = new PrintWriter(robotConnection.getOutputStream(), true); //Get output stream to send stuff to robot and set it to auto flush data
                     fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream())); //Get input stream to get stuff from robot
                     //Update UI element with text from input stream
