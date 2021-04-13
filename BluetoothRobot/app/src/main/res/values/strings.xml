@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ResearchRobot</string>
+    <string name="app_name">BluetoothRobot</string>
     <string name="etIP_hint">Enter Robot IP</string>
     <string name="btnConnect_text">Connect To Server</string>
     <string name="etMessage_hint">Enter Message</string>

@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvMessages; //TextView to show messages from robot
 
     //Bluetooth Objects
-    private final UUID robotUUID = UUID.fromString(String.valueOf(R.string.uuid)); //UUID for the bluetooth connection itself
+    private UUID robotUUID = null; //UUID for the bluetooth connection itself
     private BluetoothSocket robotConnection = null; //Bluetooth socket to communicate with the robot over
     private BluetoothDevice robot = null; //Bluetooth device representing the robot's bluetooth adapter
     private BluetoothAdapter btAdapter = null; //local device's bluetooth adapter
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             if(BluetoothDevice.ACTION_FOUND.equals(action)) { //if action from filter is a Bluetooth Device Found action, check if the device is the robot. If so, make a connection
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 String deviceHardwareAddress = device.getAddress();
-                if(deviceHardwareAddress.equalsIgnoreCase(String.valueOf(R.string.robotHardwareAddress))) {
+                if(deviceHardwareAddress.equalsIgnoreCase(getString(R.string.robotHardwareAddress))) {
                     robot = device;
                     connectThread = new ConnectThread();
                     connectThread.start();
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(receiver, filter);
+        robotUUID = UUID.fromString(getString(R.string.uuid));
 
         //setup UI elements
         tvMessages = findViewById(R.id.tvMessages);
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 if (pairedDevices.size() > 0 && robot == null) {
                     for (BluetoothDevice device : pairedDevices) {
                         String deviceHardwareAddress = device.getAddress();
-                        if (deviceHardwareAddress.equalsIgnoreCase(String.valueOf(R.string.robotHardwareAddress))) {
+                        if (deviceHardwareAddress.equalsIgnoreCase(getString(R.string.robotHardwareAddress))) {
                             robot = device;
                         }
                     }
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     connectThread = new ConnectThread(); //Start a new connection to the robot
                     connectThread.start();
                 } else {
+                    Snackbar.make(findViewById(R.id.activity_main), "Starting Bluetooth discovery to find robot", Snackbar.LENGTH_LONG).show();
                     btAdapter.startDiscovery(); //find robot
                 }
 
@@ -129,11 +131,11 @@ public class MainActivity extends AppCompatActivity {
     private class ConnectThread extends Thread { //Sends a bluetooth connection to the robot
         public void run() {
             btAdapter.cancelDiscovery();
-            if(!robotConnection.isConnected()) { //if there isn't already a connection to the robot
+            if((robotConnection != null && !robotConnection.isConnected()) || robotConnection == null) { //if there isn't already a connection to the robot or if there was a connection but it has since been closed
                 try {
                     robotConnection = robot.createRfcommSocketToServiceRecord(robotUUID); //Send connection request to robot
                     robotConnection.connect();
-
+                    Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show();
                     toRobot = new PrintWriter(robotConnection.getOutputStream(), true); //Get output stream to send stuff to robot and set it to auto flush data
                     fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream())); //Get input stream to get stuff from robot
 
