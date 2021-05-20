@@ -32,10 +32,10 @@ public class MainActivity extends AppCompatActivity {
 
     //UI Objects
     private EditText etMessage; //Input field to create message to send
-    private TextView tvMessages; //TextView to show messages from robot
+    private TextView tvMessages; //TextView to show messages from robot. Acts as a message log
 
     //Bluetooth Objects
-    private UUID robotUUID = null; //UUID for the bluetooth connection itself
+    private UUID robotUUID = null; //UUID for the bluetooth connection itself. This is needed to fully connect to the robot over bluetooth
     private BluetoothSocket robotConnection = null; //Bluetooth socket to communicate with the robot over
     private BluetoothDevice robot = null; //Bluetooth device representing the robot's bluetooth adapter
     private BluetoothAdapter btAdapter = null; //local device's bluetooth adapter
@@ -46,9 +46,9 @@ public class MainActivity extends AppCompatActivity {
             if(BluetoothDevice.ACTION_FOUND.equals(action)) { //if action from filter is a Bluetooth Device Found action, check if the device is the robot. If so, make a connection
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 String deviceHardwareAddress = device.getAddress();
-                if(deviceHardwareAddress.equalsIgnoreCase(getString(R.string.robotHardwareAddress))) {
-                    robot = device;
-                    connectThread = new ConnectThread();
+                if(deviceHardwareAddress.equalsIgnoreCase(getString(R.string.robotHardwareAddress))) { //This is the MAC Address for the bluetooth adapter on the robot
+                    robot = device; //This means that the robot was found during Bluetooth discovery and the app should connect to it
+                    connectThread = new ConnectThread(); //start a connection to the robot
                     connectThread.start();
                 }
             }
@@ -69,25 +69,20 @@ public class MainActivity extends AppCompatActivity {
 
         //setup UI elements
         tvMessages = findViewById(R.id.tvMessages);
-        tvMessages.setMovementMethod(new ScrollingMovementMethod());
+        tvMessages.setMovementMethod(new ScrollingMovementMethod()); //Set the message TextView to scroll to the newest text once there are enough lines
         etMessage = findViewById(R.id.etMessage);
         Button btnSend = findViewById(R.id.btnSend);
         Button btnConnect = findViewById(R.id.btnConnect);
 
         //Set click event listeners for buttons
         btnConnect.setOnClickListener(v -> {
-            /*if(!btAdapter.isEnabled()) {
-                //Make snackbar to enable bluetooth
-            }\
 
-            if bluetooth is disabled, make toast telling to enable bluetooth. else make connection
-             */
-            if(!btAdapter.isEnabled()) {
+            if(!btAdapter.isEnabled()) { //If bluetooth on the tablet is turned off, show a message to turn it on instead of crashing
                 Snackbar.make(findViewById(R.id.activity_main), "Please enable Bluetooth in the settings", Snackbar.LENGTH_LONG).show();
             }
 
             else {
-                Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices();
+                Set<BluetoothDevice> pairedDevices = btAdapter.getBondedDevices(); //Check if the robot is already paired with the tablet.
 
                 if (pairedDevices.size() > 0 && robot == null) {
                     for (BluetoothDevice device : pairedDevices) {
@@ -98,11 +93,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                if (robot != null) {
+                if (robot != null) { //If the robot was already paired:
                     //attempt connection
                     connectThread = new ConnectThread(); //Start a new connection to the robot
                     connectThread.start();
-                } else {
+                } else { //Otherwise the robot wasn't already paired
                     Snackbar.make(findViewById(R.id.activity_main), "Starting Bluetooth discovery to find robot", Snackbar.LENGTH_LONG).show();
                     btAdapter.startDiscovery(); //find robot
                 }
@@ -111,16 +106,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnSend.setOnClickListener(v -> {
+        btnSend.setOnClickListener(v -> { //Send message to robot
             String message = etMessage.getText().toString().trim(); //get message to send to robot and cleanup leading and trailing whitespace
-            if(!message.isEmpty()) {
-                new WriteThread(message).start(); //start thread to send message to robot
+            if(!message.isEmpty()) { //If there is a message to send
+                new Thread(new WriteThread(message)).start(); //start thread to send message to robot
             }
         });
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onDestroy() { //Cleanup on app close
         super.onDestroy();
         readThread.cancel();
         toRobot.close();
@@ -135,12 +130,12 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     robotConnection = robot.createRfcommSocketToServiceRecord(robotUUID); //Send connection request to robot
                     robotConnection.connect();
-                    Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show();
-                    toRobot = new PrintWriter(robotConnection.getOutputStream(), true); //Get output stream to send stuff to robot and set it to auto flush data
+                    Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show(); //Notify the user that the two devices are connected
+                    toRobot = new PrintWriter(robotConnection.getOutputStream()); //Get output stream to send stuff to robot
                     fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream())); //Get input stream to get stuff from robot
 
                     //Update UI element with text from input stream
-                    runOnUiThread(() -> tvMessages.setText("Connected\n"));
+                    runOnUiThread(() -> tvMessages.setText("Connected\n")); //Puts 'connected' message onto message log
                     readThread = new ReadThread(); //start a thread to handle input from robot
                     readThread.start();
 
@@ -191,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class WriteThread extends Thread {
+    private class WriteThread implements Runnable {
         private final String message;
 
         public WriteThread(String message) {
@@ -201,8 +196,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void run() {
             toRobot.write(message);
+            toRobot.flush(); //send message over bluetooth to robot
             runOnUiThread(() -> {
-                tvMessages.append("android: " + message + "\n");
+                tvMessages.append("android: " + message + "\n"); //append message to message log
                 etMessage.setText("");
             });
         }
