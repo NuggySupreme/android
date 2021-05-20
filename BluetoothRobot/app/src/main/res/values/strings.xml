@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">BluetoothRobot</string>
     <string name="etIP_hint">Enter Robot IP</string>
-    <string name="btnConnect_text">Connect To Server</string>
+    <string name="btnConnect_text">Connect To Robot</string>
+    <string name="btnClose_text">Disconnect from Robot</string>
     <string name="etMessage_hint">Enter Message</string>
     <string name="btnSend_text">SEND</string>
     <string name="robotHardwareAddress">58:96:1D:BF:D1:72</string>

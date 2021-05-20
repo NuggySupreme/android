@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     //IO Objects
     private ConnectThread connectThread = null; //thread to send connection request to robot
     private ReadThread readThread = null; //thread for reading input from robot
+    private WriteThread writeThread = null;
     private PrintWriter toRobot; //sends output to robot
     private BufferedReader fromRobot; //gets input from robot
 
@@ -73,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         etMessage = findViewById(R.id.etMessage);
         Button btnSend = findViewById(R.id.btnSend);
         Button btnConnect = findViewById(R.id.btnConnect);
+        Button btnClose = findViewById(R.id.btnClose);
 
         //Set click event listeners for buttons
         btnConnect.setOnClickListener(v -> {
@@ -110,17 +112,22 @@ public class MainActivity extends AppCompatActivity {
             String message = etMessage.getText().toString().trim(); //get message to send to robot and cleanup leading and trailing whitespace
             if(!message.isEmpty()) { //If there is a message to send
                 new Thread(new WriteThread(message)).start(); //start thread to send message to robot
-            }
+        });
+
+        btnClose.setOnClickListener(v -> {
+            closeConnection();
         });
     }
 
     @Override
     protected void onDestroy() { //Cleanup on app close
         super.onDestroy();
-        readThread.cancel();
-        toRobot.close();
-        connectThread.cancel();
+        closeConnection();
         unregisterReceiver(receiver);
+    }
+
+    private void closeConnection() {
+        toRobot.close();
     }
 
     private class ConnectThread extends Thread { //Sends a bluetooth connection to the robot
