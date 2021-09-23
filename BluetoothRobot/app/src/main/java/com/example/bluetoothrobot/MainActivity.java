@@ -11,6 +11,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         Button btnSend = findViewById(R.id.btnSend);
         Button btnConnect = findViewById(R.id.btnConnect);
         Button btnClose = findViewById(R.id.btnClose);
+        Button btnSwitch = findViewById(R.id.btnSwitch);
 
         //Set click event listeners for buttons
         btnConnect.setOnClickListener(v -> {
@@ -109,12 +111,25 @@ public class MainActivity extends AppCompatActivity {
 
         btnSend.setOnClickListener(v -> { //Send message to robot
             String message = etMessage.getText().toString().trim(); //get message to send to robot and cleanup leading and trailing whitespace
-            if(!message.isEmpty()) { //If there is a message to send
-                new Thread(new WriteThread(message)).start(); //start thread to send message to robot
+            if(toRobot != null) {
+                if (!message.isEmpty()) { //If there is a message to send
+                    new Thread(new WriteThread(message)).start(); //start thread to send message to robot
+                }
+            } else {
+                Snackbar.make(findViewById(R.id.activity_main), "Please connect to the robot", Snackbar.LENGTH_LONG).show();
             }
         });
 
         btnClose.setOnClickListener(v -> closeConnection());
+
+        btnSwitch.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                System.out.println("Button Clicked");
+
+                Intent GLIntent = new Intent(getApplicationContext(), OpenGLES20Activity.class);
+                startActivity(GLIntent);
+            }
+        });
     }
 
     @Override
@@ -126,9 +141,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void closeConnection() {
         try {
-            toRobot.close();
-            fromRobot.close();
-            connectThread.cancel();
+            if(toRobot != null) {
+                toRobot.close();
+            }
+            if(fromRobot != null) {
+                fromRobot.close();
+            }
+            if(connectThread != null) {
+                connectThread.cancel();
+            }
             toRobot = null;
         } catch(Exception e) {
             Log.e("Error", "connection closing error");
@@ -204,16 +225,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            if (toRobot != null) {
-                toRobot.write(message);
-                toRobot.flush(); //send message over bluetooth to robot
-                runOnUiThread(() -> {
-                    tvMessages.append("android: " + message + "\n"); //append message to message log
-                    etMessage.setText("");
-                });
-            } else {
-                Snackbar.make(findViewById(R.id.activity_main), "Please connect to the robot", Snackbar.LENGTH_LONG).show(); //Notify the user that the two devices are connected
-            }
+            toRobot.write(message);
+            toRobot.flush(); //send message over bluetooth to robot
+            runOnUiThread(() -> {
+                tvMessages.append("android: " + message + "\n"); //append message to message log
+                etMessage.setText("");
+            });
         }
     }
 }

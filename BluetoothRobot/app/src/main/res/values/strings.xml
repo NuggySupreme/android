@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">BluetoothRobot</string>
-    <string name="etIP_hint">Enter Robot IP</string>
-    <string name="btnConnect_text">Connect To Robot</string>
-    <string name="btnClose_text">Disconnect from Robot</string>
+    <string name="btnConnect_text">Connect</string>
+    <string name="btnClose_text">Disconnect</string>
+    <string name="btnSwitch_text">Graph</string>
     <string name="etMessage_hint">Enter Message</string>
     <string name="btnSend_text">SEND</string>
     <string name="robotHardwareAddress">58:96:1D:BF:D1:72</string>
     <string name="uuid">188f9a96-7ecc-4bc3-8a94-39a792951a6e</string>
+    <string name="title_activity_open_gles20">OpenGLES20Activity</string>
 </resources>
