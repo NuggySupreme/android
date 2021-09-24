@@ -122,13 +122,11 @@ public class MainActivity extends AppCompatActivity {
 
         btnClose.setOnClickListener(v -> closeConnection());
 
-        btnSwitch.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                System.out.println("Button Clicked");
+        btnSwitch.setOnClickListener(v -> {
+            System.out.println("Button Clicked");
 
-                Intent GLIntent = new Intent(getApplicationContext(), OpenGLES20Activity.class);
-                startActivity(GLIntent);
-            }
+            Intent GLIntent = new Intent(getApplicationContext(), OpenGLES20Activity.class);
+            startActivity(GLIntent);
         });
     }
 
