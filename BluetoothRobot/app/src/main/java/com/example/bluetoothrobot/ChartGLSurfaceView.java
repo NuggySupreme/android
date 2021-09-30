@@ -1,61 +1,63 @@
 package com.example.bluetoothrobot;
 
+
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.opengl.GLSurfaceView;
 
-import java.util.Arrays;
-
-public class ChartGLSurfaceView extends GLSurfaceView {
+public class ChartGLSurfaceView extends GLSurfaceView{
 
     private final ChartGLRenderer chartRenderer;
-    private float[] dataPoints = new float[100];
+    private float[] datapoints = new float[150];
 
-    boolean isUpdating = true; //flag for when the chart data points are updating
+    boolean isUpdating = false;
 
     public ChartGLSurfaceView(Context context) {
         super(context);
 
-        //Create an OpenGL ES 2.0 context
-        setEGLContextClientVersion(2);
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        this.setZOrderOnTop(true);
+        this.setZOrderOnTop(true); //necessary
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
-
-        chartRenderer = new ChartGLRenderer(this.getContext());
-
-        //Set the Renderer for drawing on the GLSurfaceView
+        // Set the Renderer for drawing on the GLSurfaceView
+        chartRenderer = new ChartGLRenderer(context);
         setRenderer(chartRenderer);
 
-        Arrays.fill(dataPoints, 0);
+        float j = -7.0f;
+        for (int i = 0; i < datapoints.length; i+= 2){
+            datapoints[i] = j;
+            j += 0.2f;
+        }
 
-        appendChartData(0, 0);
+        setChartData(datapoints);
+        // Render the view only when there is a change in the drawing data
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         new Thread(new Task()).start();
     }
 
-    public void appendChartData(float x, float y) {
-        if(x != 0 || y != 0) {
+    public void setChartData(float[] datapoints) {
+        if (datapoints.length > 0){
             isUpdating = true;
-            System.arraycopy(dataPoints, 2, this.dataPoints, 0, dataPoints.length - 2);
-            this.dataPoints[this.dataPoints.length - 2] = x;
-            this.dataPoints[this.dataPoints.length - 1] = y;
+            this.datapoints = datapoints.clone();
+            isUpdating = false;
         }
-        isUpdating = false;
+    }
+
+    public float[] getChartData() {
+        return this.datapoints;
     }
 
     class Task implements Runnable {
         @Override
         public void run() {
-            while(true) {
-                if(!isUpdating) {
-                    chartRenderer.chartData = dataPoints;
+            while (true){
+                if (!isUpdating){
+                    chartRenderer.chartData = datapoints;
                     requestRender();
                 }
+
                 try {
-                    appendChartData((float)System.currentTimeMillis(), (float) Math.sin(System.currentTimeMillis()));
-                    Thread.sleep(100);
-                } catch(InterruptedException e) {
+                    Thread.sleep(15);
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }

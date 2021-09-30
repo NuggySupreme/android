@@ -1,6 +1,5 @@
 package com.example.bluetoothrobot;
 
-import androidx.appcompat.app.AppCompatActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -11,10 +10,11 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -131,6 +131,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        robotConnection = Robot.getRobot();
+        if (robotConnection != null) {
+            try {
+                toRobot = new PrintWriter(robotConnection.getOutputStream()); //Get output stream to send stuff to robot
+                fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream())); //Get input stream to get stuff from robot
+
+                //Update UI element with text from input stream
+                runOnUiThread(() -> tvMessages.setText("Connected\n")); //Puts 'connected' message onto message log
+                //thread for reading input from robot
+                //ReadThread readThread = new ReadThread(); //start a thread to handle input from robot
+                new ReadThread().start();
+
+            } catch (IOException e) {
+                Log.e("Error", "connecting to robot error");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
     protected void onDestroy() { //Cleanup on app close
         super.onDestroy();
         closeConnection();
@@ -161,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
             if((robotConnection != null && !robotConnection.isConnected()) || robotConnection == null) { //if there isn't already a connection to the robot or if there was a connection but it has since been closed
                 try {
                     robotConnection = robot.createRfcommSocketToServiceRecord(robotUUID); //Send connection request to robot
+                    Robot.setRobot(robotConnection);
                     robotConnection.connect();
                     Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show(); //Notify the user that the two devices are connected
                     toRobot = new PrintWriter(robotConnection.getOutputStream()); //Get output stream to send stuff to robot
@@ -169,8 +193,8 @@ public class MainActivity extends AppCompatActivity {
                     //Update UI element with text from input stream
                     runOnUiThread(() -> tvMessages.setText("Connected\n")); //Puts 'connected' message onto message log
                     //thread for reading input from robot
-                    ReadThread readThread = new ReadThread(); //start a thread to handle input from robot
-                    readThread.start();
+                    //ReadThread readThread = new ReadThread(); //start a thread to handle input from robot
+                    new ReadThread().start();
 
                 } catch (IOException e) {
                     Log.e("Error", "connecting to robot error");
@@ -190,25 +214,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ReadThread extends Thread { //Gets input from robot
+        private boolean go = true;
+
         @Override
         public void run() {
-            while(true) {
-                if(robotConnection.isConnected()) { //if the robot is connected
-                    try {
-                        final String message = fromRobot.readLine(); //get message from robot
-                        if(message != null) { //if the message is not empty
-                            runOnUiThread(() -> {
-                                tvMessages.append("robot: " + message + "\n"); //append message to log
-                            });
+            while(go) {
+                if(robotConnection != null) {
+                    if (robotConnection.isConnected()) { //if the robot is connected
+                        try {
+                            final String message = fromRobot.readLine(); //get message from robot
+                            if (message != null) { //if the message is not empty
+                                runOnUiThread(() -> {
+                                    tvMessages.append("robot: " + message + "\n"); //append message to log
+                                });
+                            }
+                        } catch (IOException e) {
+                            Log.e("error", "reading from robot error");
+                            e.printStackTrace();
                         }
-                    } catch(IOException e) {
-                        Log.e("error", "reading from robot error");
-                        e.printStackTrace();
+                    } else { //Otherwise robot connection needs to be restarted
+                        go = false;
+                        connectThread = new ConnectThread();
+                        connectThread.start();
                     }
-                } else { //Otherwise robot connection needs to be restarted
-                    connectThread = new ConnectThread();
-                    connectThread.start();
-                    return;
                 }
             }
         }

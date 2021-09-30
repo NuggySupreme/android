@@ -1,9 +1,5 @@
 package com.example.bluetoothrobot;
 
-import android.content.Context;
-import android.opengl.GLSurfaceView;
-import android.opengl.GLU;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -11,10 +7,13 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.content.Context;
+import android.opengl.GLSurfaceView;
+import android.opengl.GLU;
+
 public class ChartGLRenderer implements GLSurfaceView.Renderer {
 
-    private SignalChart sineChart;
-    GL10 glx;
+    private final SignalChart sineChart = new SignalChart();
     public volatile float[] chartData = new float[400];
     int width;
     int height;
@@ -22,7 +21,6 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
 
     /** Constructor */
     public ChartGLRenderer(Context context) {
-        this.sineChart = new SignalChart();
         this.context = context;
     }
 
@@ -30,11 +28,11 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl) {
         // clear Screen and Depth Buffer
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
-        // Reset the ModelView Matrix
+        // Reset the Modelview Matrix
         gl.glLoadIdentity();
         // Drawing
         //Log.d("Chart Ratio1 "," width " +width + " H " + height);
-        gl.glTranslatef(0.0f, 0.0f, -3.0f);     // move 5 units INTO the screen
+        gl.glTranslatef(0.0f, 0.0f, -5.0f);     // move 5 units INTO the screen
         // is the same as moving the camera 5 units away
         this.sineChart.setResolution(width, height);
         this.sineChart.setChartData(chartData);
@@ -67,16 +65,15 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
 }
 
 class SignalChart {
-    public float chartData[] = new float[350];
-    private float CHART_POINT = 350.0f;
+    public float[] chartData = new float[150];
+    private final float CHART_POINT = 75.0f;
     int width;
     int height;
     private FloatBuffer vertexBuffer;   // buffer holding the vertices
-    private float vertices[] = new float[(int) (CHART_POINT * 3.0f)];
+    private float[] vertices = new float[(int) (CHART_POINT * 3.0f)];
 
     public void drawRealtimeChart (){
-        float verticeInc = 2.0f/CHART_POINT;
-        // update x vertices
+        // update x vertrices
         int k = 0;
         for(int i = 0; i < CHART_POINT * 3; i = i + 3) {
             if ( i < CHART_POINT * 3){
@@ -93,17 +90,12 @@ class SignalChart {
                 k += 2;
             }
         }
-        // update z vertices
+        // update z vertrices
         for(int i = 2; i < CHART_POINT * 3; i = i + 3) {
             if ( i + 3 < CHART_POINT * 3){
                 vertices[i] = 0.0f;
             }
         }
-        // Debug Chart Value
-		/*
-		for (int i = 0; i < CHART_POINT * 3; i++){
-			Log.d("VERTICES", "test :" + vertices[i]);
-		}*/
     }
 
     /**
@@ -133,10 +125,6 @@ class SignalChart {
         vertexBuffer.position(0);
     }
 
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
     public void setResolution(int width, int height){
         this.width = width;
         this.height = height;
