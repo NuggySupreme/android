@@ -8,32 +8,25 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
     //IO Objects
-    private ConnectThread connectThread = null; //thread to send connection request to robot
     private PrintWriter toRobot; //sends output to robot
-    private BufferedReader fromRobot; //gets input from robot
-    private ReadThread read = null;
+
     //UI Objects
     private EditText etMessage; //Input field to create message to send
-    private TextView tvMessages; //TextView to show messages from robot. Acts as a message log
 
     //Bluetooth Objects
     private UUID robotUUID = null; //UUID for the bluetooth connection itself. This is needed to fully connect to the robot over bluetooth
@@ -49,8 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 String deviceHardwareAddress = device.getAddress();
                 if(deviceHardwareAddress.equalsIgnoreCase(getString(R.string.robotHardwareAddress))) { //This is the MAC Address for the bluetooth adapter on the robot
                     robot = device; //This means that the robot was found during Bluetooth discovery and the app should connect to it
-                    connectThread = new ConnectThread(); //start a connection to the robot
-                    connectThread.start();
+                    (new ConnectThread()).start();
                 }
             }
         }
@@ -66,11 +58,14 @@ public class MainActivity extends AppCompatActivity {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(receiver, filter);
+
         robotUUID = UUID.fromString(getString(R.string.uuid));
+        Intent intent = getIntent();
+        if(intent.hasExtra("btDevice")) {
+            robot = intent.getParcelableExtra("btDevice");
+        }
 
         //setup UI elements
-        tvMessages = findViewById(R.id.tvMessages);
-        tvMessages.setMovementMethod(new ScrollingMovementMethod()); //Set the message TextView to scroll to the newest text once there are enough lines
         etMessage = findViewById(R.id.etMessage);
         Button btnSend = findViewById(R.id.btnSend);
         Button btnConnect = findViewById(R.id.btnConnect);
@@ -98,14 +93,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if (robot != null) { //If the robot was already paired:
                     //attempt connection
-                    connectThread = new ConnectThread(); //Start a new connection to the robot
-                    connectThread.start();
+                    (new ConnectThread()).start();
                 } else { //Otherwise the robot wasn't already paired
                     Snackbar.make(findViewById(R.id.activity_main), "Starting Bluetooth discovery to find robot", Snackbar.LENGTH_LONG).show();
                     btAdapter.startDiscovery(); //find robot
                 }
-
-                tvMessages.setText(""); //clear message TextView
             }
         });
 
@@ -123,9 +115,8 @@ public class MainActivity extends AppCompatActivity {
         btnClose.setOnClickListener(v -> closeConnection());
 
         btnSwitch.setOnClickListener(v -> {
-            System.out.println("Button Clicked");
-
             Intent GLIntent = new Intent(getApplicationContext(), OpenGLES20Activity.class);
+            GLIntent.putExtra("btDevice", robot);
             startActivity(GLIntent);
         });
     }
@@ -133,36 +124,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        robotUUID = UUID.fromString(getString(R.string.uuid));
-        robotConnection = Robot.getRobot();
-        if (robotConnection != null) {
-            try {
-                toRobot = new PrintWriter(robotConnection.getOutputStream()); //Get output stream to send stuff to robot
-                fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream())); //Get input stream to get stuff from robot
-
-                if(read == null) {
-                    read = new ReadThread();
-                    read.start();
-                }
-
-                //Update UI element with text from input stream
-                runOnUiThread(() -> tvMessages.setText("Connected\n")); //Puts 'connected' message onto message log
-                //thread for reading input from robot
-                //ReadThread readThread = new ReadThread(); //start a thread to handle input from robot
-            } catch (IOException e) {
-                Log.e("Error", "connecting to robot error");
-                e.printStackTrace();
-            }
+        if (robot != null) { //if we are coming in from OpenGLActivity with an already found robot
+            (new ConnectThread()).start();
         }
     }
 
-    @Override
-    protected void onPause() {
-        Robot.setRobot(robotConnection);
-        super.onPause();
-        read.go = false;
-    }
 
     @Override
     protected void onDestroy() { //Cleanup on app close
@@ -176,16 +142,9 @@ public class MainActivity extends AppCompatActivity {
             if(toRobot != null) {
                 toRobot.close();
             }
-            if(fromRobot != null) {
-                fromRobot.close();
+            if(robotConnection != null) {
+                robotConnection.close();
             }
-            if(connectThread != null) {
-                connectThread.cancel();
-            }
-            if(read != null) {
-                read.go = false;
-            }
-            toRobot = null;
         } catch(Exception e) {
             Log.e("Error", "connection closing error");
             e.printStackTrace();
@@ -195,66 +154,15 @@ public class MainActivity extends AppCompatActivity {
     private class ConnectThread extends Thread { //Sends a bluetooth connection to the robot
         public void run() {
             btAdapter.cancelDiscovery();
-            if((robotConnection != null && !robotConnection.isConnected()) || robotConnection == null) { //if there isn't already a connection to the robot or if there was a connection but it has since been closed
-
-                try {
-                    robotConnection = robot.createRfcommSocketToServiceRecord(robotUUID); //Send connection request to robot
-                    robotConnection.connect();
-                    Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show(); //Notify the user that the two devices are connecte
-                    toRobot = new PrintWriter(robotConnection.getOutputStream()); //Get output stream to send stuff to robot
-                    fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream())); //Get input stream to get stuff from robot
-                    Robot.setRobot(robotConnection);
-
-                    //Update UI element with text from input stream
-                    runOnUiThread(() -> tvMessages.setText("Connected\n")); //Puts 'connected' message onto message log
-                    //thread for reading input from robot
-                    //ReadThread readThread = new ReadThread(); //start a thread to handle input from robot
-                    if(read == null) {
-                        read = new ReadThread();
-                        read.start();
-                    }
-
-                } catch (IOException e) {
-                    Log.e("Error", "connecting to robot error");
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        public void cancel() {
             try {
-                robotConnection.close();
-            } catch(IOException e) {
-                Log.e("error", "closing robot connection error");
+                robotConnection = robot.createRfcommSocketToServiceRecord(robotUUID); //Send connection request to robot
+                robotConnection.connect();
+                Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show(); //Notify the user that the two devices are connecte
+                toRobot = new PrintWriter(robotConnection.getOutputStream()); //Get output stream to send stuff to robot
+            } catch (IOException e) {
+                Log.e("Error", "connecting to robot error");
                 e.printStackTrace();
             }
-        }
-    }
-
-    private class ReadThread extends Thread { //Gets input from robot
-        public boolean go = true;
-
-        @Override
-        public void run() {
-            while(go) {
-                if (robotConnection.isConnected()) { //if the robot is connected
-                    try {
-                        final String message = fromRobot.readLine(); //get message from robot
-                        if (message != null) { //if the message is not empty
-                            runOnUiThread(() -> {
-                                tvMessages.append("robot: " + message + "\n"); //append message to log
-                            });
-                        }
-                    } catch (IOException e) {
-                        Log.e("error", "reading from robot error");
-                        go = false;
-                        e.printStackTrace();
-                    }
-                } else { //Otherwise robot connection needs to be restarted
-                    go = false;
-                }
-            }
-            Log.e("error", "Read thread in Main closed out");
         }
     }
 
@@ -270,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
             toRobot.write(message);
             toRobot.flush(); //send message over bluetooth to robot
             runOnUiThread(() -> {
-                tvMessages.append("android: " + message + "\n"); //append message to message log
                 etMessage.setText("");
             });
         }
