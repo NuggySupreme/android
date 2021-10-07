@@ -5,4 +5,4 @@ to render 3D skeleton joint data from Nuitrack SDK, though there might be other 
 would require minimal changes.
 
 To compile the Android portion:
-Setup Android Studio using the instruction found at . Then, import the BluetoothRobot folder as a project, build it, and run it on any Android device running Android 9.0 or higher. 
+Setup Android Studio. Then, import the BluetoothRobot folder as a project, build it, and run it on any Android device running Android 9.0 or higher. 
