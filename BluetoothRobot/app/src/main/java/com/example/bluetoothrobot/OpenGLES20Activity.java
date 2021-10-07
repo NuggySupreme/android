@@ -88,19 +88,29 @@ public class OpenGLES20Activity extends AppCompatActivity {
         @Override
 
         public void run() {
+            String junk = "";
+            String trash = "";
+            int count = 0;
+            try {
+                while (count < 20) {
+                    junk = junk + fromRobot.readLine();
+                    count++;
+                }
+            } catch(Exception e) {
+                Log.e("error", "junk cleaning error");
+            }
             while(go) {
                 if(robotConnection != null) { //if the robot is connected
                     if (robotConnection.isConnected()) {
                         try {
                             final String message = fromRobot.readLine(); //get message from robot
-                            if (message != null && message.startsWith("CDAT")) { //if the message is not empty
+                            if (message != null && message.startsWith("DATA:")) { //if the message is not empty
                                 float[] data = gLView.getChartData();
                                 for (int i = 1; i < data.length - 2; i += 2) {
                                     data[i] = data[i + 2];
                                 }
-                                String val = message.substring(4);
-                                System.out.println(val);
-                                data[data.length - 1] = (new Random().nextFloat() * 2) - 1.0f; //Float.parseFloat(val)
+                                String val = message.substring(5);
+                                data[data.length - 1] = Float.parseFloat(val);
                                 gLView.setChartData(data);
                                 customHandler.postDelayed(this, 0);
                             }

@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ConnectThread connectThread = null; //thread to send connection request to robot
     private PrintWriter toRobot; //sends output to robot
     private BufferedReader fromRobot; //gets input from robot
-
+    private ReadThread read = null;
     //UI Objects
     private EditText etMessage; //Input field to create message to send
     private TextView tvMessages; //TextView to show messages from robot. Acts as a message log
@@ -131,26 +131,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
+    protected void onStart() {
+        super.onStart();
 
+        robotUUID = UUID.fromString(getString(R.string.uuid));
         robotConnection = Robot.getRobot();
         if (robotConnection != null) {
             try {
                 toRobot = new PrintWriter(robotConnection.getOutputStream()); //Get output stream to send stuff to robot
                 fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream())); //Get input stream to get stuff from robot
 
+                if(read == null) {
+                    read = new ReadThread();
+                    read.start();
+                }
+
                 //Update UI element with text from input stream
                 runOnUiThread(() -> tvMessages.setText("Connected\n")); //Puts 'connected' message onto message log
                 //thread for reading input from robot
                 //ReadThread readThread = new ReadThread(); //start a thread to handle input from robot
-                new ReadThread().start();
-
             } catch (IOException e) {
                 Log.e("Error", "connecting to robot error");
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        Robot.setRobot(robotConnection);
+        super.onPause();
+        read.go = false;
     }
 
     @Override
@@ -171,6 +182,9 @@ public class MainActivity extends AppCompatActivity {
             if(connectThread != null) {
                 connectThread.cancel();
             }
+            if(read != null) {
+                read.go = false;
+            }
             toRobot = null;
         } catch(Exception e) {
             Log.e("Error", "connection closing error");
@@ -182,19 +196,23 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             btAdapter.cancelDiscovery();
             if((robotConnection != null && !robotConnection.isConnected()) || robotConnection == null) { //if there isn't already a connection to the robot or if there was a connection but it has since been closed
+
                 try {
                     robotConnection = robot.createRfcommSocketToServiceRecord(robotUUID); //Send connection request to robot
-                    Robot.setRobot(robotConnection);
                     robotConnection.connect();
-                    Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show(); //Notify the user that the two devices are connected
+                    Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show(); //Notify the user that the two devices are connecte
                     toRobot = new PrintWriter(robotConnection.getOutputStream()); //Get output stream to send stuff to robot
                     fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream())); //Get input stream to get stuff from robot
+                    Robot.setRobot(robotConnection);
 
                     //Update UI element with text from input stream
                     runOnUiThread(() -> tvMessages.setText("Connected\n")); //Puts 'connected' message onto message log
                     //thread for reading input from robot
                     //ReadThread readThread = new ReadThread(); //start a thread to handle input from robot
-                    new ReadThread().start();
+                    if(read == null) {
+                        read = new ReadThread();
+                        read.start();
+                    }
 
                 } catch (IOException e) {
                     Log.e("Error", "connecting to robot error");
@@ -214,31 +232,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class ReadThread extends Thread { //Gets input from robot
-        private boolean go = true;
+        public boolean go = true;
 
         @Override
         public void run() {
             while(go) {
-                if(robotConnection != null) {
-                    if (robotConnection.isConnected()) { //if the robot is connected
-                        try {
-                            final String message = fromRobot.readLine(); //get message from robot
-                            if (message != null) { //if the message is not empty
-                                runOnUiThread(() -> {
-                                    tvMessages.append("robot: " + message + "\n"); //append message to log
-                                });
-                            }
-                        } catch (IOException e) {
-                            Log.e("error", "reading from robot error");
-                            e.printStackTrace();
+                if (robotConnection.isConnected()) { //if the robot is connected
+                    try {
+                        final String message = fromRobot.readLine(); //get message from robot
+                        if (message != null) { //if the message is not empty
+                            runOnUiThread(() -> {
+                                tvMessages.append("robot: " + message + "\n"); //append message to log
+                            });
                         }
-                    } else { //Otherwise robot connection needs to be restarted
+                    } catch (IOException e) {
+                        Log.e("error", "reading from robot error");
                         go = false;
-                        connectThread = new ConnectThread();
-                        connectThread.start();
+                        e.printStackTrace();
                     }
+                } else { //Otherwise robot connection needs to be restarted
+                    go = false;
                 }
             }
+            Log.e("error", "Read thread in Main closed out");
         }
     }
 
