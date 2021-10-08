@@ -26,16 +26,16 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
+
         // clear Screen and Depth Buffer
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         // Reset the Modelview Matrix
         gl.glLoadIdentity();
         // Drawing
         //Log.d("Chart Ratio1 "," width " +width + " H " + height);
-        gl.glTranslatef(0.0f, 0.0f, -5.0f);     // move 5 units INTO the screen
-        // is the same as moving the camera 5 units away
-        this.sineChart.setResolution(width, height);
-        this.sineChart.setChartData(chartData);
+        gl.glTranslatef(0.0f, 0.0f, -5.0f); // move the camera 5 units away
+        sineChart.setResolution(width, height);
+        sineChart.setChartData(chartData);
         sineChart.draw(gl);
     }
 
@@ -70,7 +70,12 @@ class SignalChart {
     int width;
     int height;
     private FloatBuffer vertexBuffer;   // buffer holding the vertices
-    private float[] vertices = new float[(int) (CHART_POINT * 3.0f)];
+    private float[] vertices = new float[(int) (CHART_POINT * 3)];
+
+    public SignalChart() {
+        drawRealtimeChart();
+        vertexGenerate();
+    }
 
     public void drawRealtimeChart (){
         // update x vertrices
@@ -85,11 +90,11 @@ class SignalChart {
         k = 1;
         for(int i = 1; i < CHART_POINT * 3; i = i + 3) {
             if ( i < CHART_POINT * 3){
-                //vertices[i] = 1.0f*(float) Math.sin( (float)i * ((float)(2*Math.PI) * 1 * frequency / 44100));
                 vertices[i] = chartData[k];
                 k += 2;
             }
         }
+
         // update z vertrices
         for(int i = 2; i < CHART_POINT * 3; i = i + 3) {
             if ( i + 3 < CHART_POINT * 3){
@@ -98,16 +103,8 @@ class SignalChart {
         }
     }
 
-    /**
-     * @param chartData the chartData to set
-     */
     public void setChartData(float[] chartData) {
         this.chartData = chartData;
-        drawRealtimeChart();
-        vertexGenerate();
-    }
-
-    public SignalChart() {
         drawRealtimeChart();
         vertexGenerate();
     }
@@ -137,7 +134,7 @@ class SignalChart {
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
         // set the color for the triangle
         gl.glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
-        // Point to our vertex buffer
+        // Point to vertex buffer
         gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);
         // Line width
         gl.glLineWidth(3.0f);

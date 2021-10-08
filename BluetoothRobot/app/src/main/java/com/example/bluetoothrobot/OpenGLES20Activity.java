@@ -46,23 +46,15 @@ public class OpenGLES20Activity extends AppCompatActivity {
             (new ConnectThread()).start();
         }
 
-        //updateTimerThread.run();
-
-        //The following call resumes a paused rendering thread.
-        //If you de-allocated graphic objects for onPause()
-        //this is a good place to re-allocate them
         gLView.onResume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        //The following call pauses the rendering thread.
-        //If your OpenGL application is memory intensive,
-        //you should consider de-allocating objects that
-        //consume significant memory here
+
         closeConnection();
-        gLView.onPause();
+        gLView.onPause(); //pause the rendering thread.
     }
 
     private void closeConnection() {

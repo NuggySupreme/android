@@ -16,8 +16,9 @@ public class ChartGLSurfaceView extends GLSurfaceView{
         super(context);
 
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
-        this.setZOrderOnTop(true); //necessary
+        this.setZOrderOnTop(true);
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
+
         // Set the Renderer for drawing on the GLSurfaceView
         chartRenderer = new ChartGLRenderer(context);
         setRenderer(chartRenderer);
@@ -29,6 +30,7 @@ public class ChartGLSurfaceView extends GLSurfaceView{
         }
 
         setChartData(datapoints);
+
         // Render the view only when there is a change in the drawing data
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         new Thread(new Task()).start();
