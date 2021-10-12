@@ -2,6 +2,7 @@ package com.example.bluetoothrobot;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -35,6 +36,12 @@ public class OpenGLES20Activity extends AppCompatActivity {
         // Create a GLSurfaceView instance and set it
         // as the ContentView for this Activity.
         robotUUID = UUID.fromString(getString(R.string.uuid));
+
+        Intent intent = getIntent();
+        if(intent.hasExtra("btDevice")) {
+            robot = intent.getParcelableExtra("btDevice");
+        }
+
         gLView = new ChartGLSurfaceView(this);
         setContentView(gLView);
     }
@@ -52,21 +59,23 @@ public class OpenGLES20Activity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
         closeConnection();
         gLView.onPause(); //pause the rendering thread.
     }
 
     private void closeConnection() {
         try {
-            if (fromRobot != null) {
-                fromRobot.close();
+            if(robot != null) {
+                robot = null;
             }
             if (robotConnection != null) {
                 robotConnection.close();
             }
+            if (fromRobot != null) {
+                fromRobot.close();
+            }
             if (read != null) {
-                read.go = false;
+                read.interrupt();
             }
         } catch(Exception e) {
             Log.e("Error", "connection closing error");
@@ -79,9 +88,9 @@ public class OpenGLES20Activity extends AppCompatActivity {
             try {
                 robotConnection = robot.createRfcommSocketToServiceRecord(robotUUID); //Send connection request to robot
                 robotConnection.connect();
-                Snackbar.make(findViewById(R.id.activity_main), "Connected to robot", Snackbar.LENGTH_LONG).show(); //Notify the user that the two devices are connecte
                 fromRobot = new BufferedReader(new InputStreamReader(robotConnection.getInputStream()));
-                (new ReadThread()).start();
+                read = new ReadThread();
+                read.start();
             } catch (IOException e) {
                 Log.e("Error", "connecting to robot error");
                 e.printStackTrace();
@@ -90,44 +99,27 @@ public class OpenGLES20Activity extends AppCompatActivity {
     }
 
     private class ReadThread extends Thread { //Gets input from robot
-        private boolean go = true;
-        @Override
 
+        @Override
         public void run() {
-            String junk = "";
-            String trash = "";
-            int count = 0;
-            try {
-                while (count < 20) {
-                    junk = junk + fromRobot.readLine();
-                    count++;
-                }
-            } catch(Exception e) {
-                Log.e("error", "junk cleaning error");
-            }
-            while(go) {
-                if(robotConnection != null) { //if the robot is connected
-                    if (robotConnection.isConnected()) {
-                        try {
-                            final String message = fromRobot.readLine(); //get message from robot
-                            if (message != null && message.startsWith("DATA:")) { //if the message is not empty
-                                float[] data = gLView.getChartData();
-                                for (int i = 1; i < data.length - 2; i += 2) {
-                                    data[i] = data[i + 2];
-                                }
-                                String val = message.substring(5);
-                                data[data.length - 1] = Float.parseFloat(val);
-                                gLView.setChartData(data);
-                                customHandler.postDelayed(this, 0);
-                            }
-                        } catch (IOException e) {
-                            Log.e("error", "reading from robot error");
-                            e.printStackTrace();
+            while(!isInterrupted()) {
+                try {
+                    final String message = fromRobot.readLine(); //get message from robot
+                    Log.i("info", "got data" + message);
+                    if (message != null && message.startsWith("DATA:")) { //if the message is not empty
+                        float[] data = gLView.getChartData();
+                        for (int i = 1; i < data.length - 2; i += 2) {
+                            data[i] = data[i + 2];
                         }
+                        String val = message.substring(5);
+                        data[data.length - 1] = Float.parseFloat(val);
+                        gLView.setChartData(data);
+                        customHandler.postDelayed(this, 0);
                     }
-                }
-                else {
-                    go = false;
+                } catch (IOException e) {
+                    Log.e("error", "reading from robot error");
+                    read.interrupt();
+                    e.printStackTrace();
                 }
             }
         }

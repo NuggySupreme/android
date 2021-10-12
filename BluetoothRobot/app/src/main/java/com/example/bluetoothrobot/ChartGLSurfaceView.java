@@ -11,6 +11,7 @@ public class ChartGLSurfaceView extends GLSurfaceView{
     private float[] datapoints = new float[150];
 
     boolean isUpdating = false;
+    public RenderThread requestRender;
 
     public ChartGLSurfaceView(Context context) {
         super(context);
@@ -33,7 +34,8 @@ public class ChartGLSurfaceView extends GLSurfaceView{
 
         // Render the view only when there is a change in the drawing data
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-        new Thread(new Task()).start();
+        requestRender = new RenderThread();
+        requestRender.start();
     }
 
     public void setChartData(float[] datapoints) {
@@ -48,15 +50,14 @@ public class ChartGLSurfaceView extends GLSurfaceView{
         return this.datapoints;
     }
 
-    class Task implements Runnable {
+    class RenderThread extends Thread {
         @Override
         public void run() {
-            while (true){
+            while (!isInterrupted()){
                 if (!isUpdating){
                     chartRenderer.chartData = datapoints;
                     requestRender();
                 }
-
                 try {
                     Thread.sleep(15);
                 } catch (InterruptedException e) {
