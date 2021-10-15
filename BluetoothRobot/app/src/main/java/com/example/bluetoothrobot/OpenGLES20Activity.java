@@ -38,6 +38,7 @@ public class OpenGLES20Activity extends AppCompatActivity {
         }
 
         gLView = new ChartGLSurfaceView(this);
+        gLView.setEGLContextClientVersion(2);
         setContentView(gLView);
     }
 

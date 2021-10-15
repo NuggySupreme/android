@@ -9,7 +9,6 @@ import android.util.Log;
 public class ChartGLSurfaceView extends GLSurfaceView{
 
     private final ChartGLRenderer chartRenderer;
-    private float[] datapoints = new float[150];
 
     private float[] leftArm = new float[12];
     private float[] rightArm = new float[12];
@@ -23,18 +22,9 @@ public class ChartGLSurfaceView extends GLSurfaceView{
     public ChartGLSurfaceView(Context context) {
         super(context);
 
-        setEGLContextClientVersion(2);
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         this.setZOrderOnTop(true);
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
-
-        float j = -7.0f;
-        for (int i = 0; i < datapoints.length; i+= 2){
-            datapoints[i] = j;
-            j += 0.2f;
-        }
-
-        setChartData(datapoints);
 
         // Render the view only when there is a change in the drawing data
         // Set the Renderer for drawing on the GLSurfaceView
@@ -46,14 +36,6 @@ public class ChartGLSurfaceView extends GLSurfaceView{
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
-    public void setChartData(float[] datapoints) {
-        if (datapoints.length > 0){
-            isUpdating = true;
-            this.datapoints = datapoints.clone();
-            isUpdating = false;
-        }
-    }
-
     public void setSkeletonData(float[] la, float[] ll, float[] ra, float[] rl, float[] spine) {
         if (la.length * ll.length * ra.length * rl.length > 0){
             isUpdating = true;
@@ -62,8 +44,8 @@ public class ChartGLSurfaceView extends GLSurfaceView{
             this.leftLeg = ll.clone();
             this.rightLeg = rl.clone();
             this.spine = spine.clone();
-            isUpdating = false;
             Log.i("info", "updated skeleton info");
+            isUpdating = false;
         }
     }
 
@@ -72,11 +54,15 @@ public class ChartGLSurfaceView extends GLSurfaceView{
         public void run() {
             while (!isInterrupted()){
                 if (!isUpdating){
-                    chartRenderer.chartData = datapoints;
+                    chartRenderer.leftArmData = leftArm;
+                    chartRenderer.leftLegData = leftLeg;
+                    chartRenderer.rightArmData = rightArm;
+                    chartRenderer.rightLegData = rightLeg;
+                    chartRenderer.spineData = spine;
                     requestRender();
                 }
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -10,12 +10,18 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.opengl.GLES20;
 
 public class ChartGLRenderer implements GLSurfaceView.Renderer {
 
-    private final SignalChart sineChart = new SignalChart();
-    public volatile float[] chartData = new float[400];
-    private
+    private final Skeleton skeleton = new Skeleton();
+
+    public volatile float[] leftArmData = new float[12];
+    public volatile float[] leftLegData = new float[12];
+    public volatile float[] rightArmData = new float[12];
+    public volatile float[] rightLegData = new float[12];
+    public volatile float[] spineData = new float[6];
+
     int width;
     int height;
     Context context;
@@ -29,15 +35,15 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl) {
 
         // clear Screen and Depth Buffer
-        gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         // Reset the Modelview Matrix
         gl.glLoadIdentity();
         // Drawing
         //Log.d("Chart Ratio1 "," width " +width + " H " + height);
         gl.glTranslatef(0.0f, 0.0f, -5.0f); // move the camera 5 units away
-        sineChart.setResolution(width, height);
-        sineChart.setChartData(chartData);
-        sineChart.draw(gl);
+        skeleton.setResolution(width, height);
+        skeleton.setSkeletonData(leftArmData, leftLegData, rightArmData, rightLegData, spineData);
+        skeleton.draw(gl);
     }
 
     @Override
@@ -48,7 +54,7 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
         if(height == 0) {                       //Prevent A Divide By Zero By
             height = 1;                         //Making Height Equal One
         }
-        gl.glViewport(0, 0, width, height);     //Reset The Current Viewport
+        GLES20.glViewport(0, 0, width, height);     //Reset The Current Viewport
         gl.glMatrixMode(GL10.GL_PROJECTION);    //Select The Projection Matrix
         gl.glLoadIdentity();                    //Reset The Projection Matrix
 
@@ -61,72 +67,90 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     }
 }
 
-class SignalChart {
-    public float[] chartData = new float[150];
-    private final float CHART_POINT = 75.0f;
+class Skeleton {
+    public float[] leftArm = new float[12];
+    public float[] leftLeg = new float[12];
+    public float[] rightArm = new float[12];
+    public float[] rightLeg = new float[12];
+    public float[] spine = new float[6];
+
+
+    private float[] lAVert = new float[12];
+    private float[] lLVert = new float[12];
+    private float[] rAVert = new float[12];
+    private float[] rLVert = new float[12];
+    private float[] sVert = new float[12];
+
+    private FloatBuffer lABuffer;
+    private FloatBuffer lLBuffer;
+    private FloatBuffer rABuffer;
+    private FloatBuffer rLBuffer;
+    private FloatBuffer sBuffer;
+
     int width;
     int height;
-    private FloatBuffer vertexBuffer;   // buffer holding the vertices
-    private float[] vertices = new float[(int) (CHART_POINT * 3)];
 
-    public SignalChart() {
-        drawRealtimeChart();
+    public Skeleton() {
+        drawSkeleton();
         vertexGenerate();
     }
 
-    public void drawRealtimeChart (){
-        // update x vertrices
-        int k = 0;
-        for(int i = 0; i < CHART_POINT * 3; i = i + 3) {
-            if ( i < CHART_POINT * 3){
-                vertices[i] = chartData[k];
-                k += 2;
-            }
-        }
-        // update y vertrices
-        k = 1;
-        for(int i = 1; i < CHART_POINT * 3; i = i + 3) {
-            if ( i < CHART_POINT * 3){
-                vertices[i] = chartData[k];
-                k += 2;
-            }
-        }
-
-        // update z vertrices
-        for(int i = 2; i < CHART_POINT * 3; i = i + 3) {
-            if ( i + 3 < CHART_POINT * 3){
-                vertices[i] = 0.0f;
-            }
-        }
-    }
-
-    public void setChartData(float[] chartData) {
-        this.chartData = chartData;
-        drawRealtimeChart();
+    public void setSkeletonData(float[] lA, float[] lL, float[] rA, float[] rL, float[] s) {
+        this.leftArm = lA;
+        this.leftLeg = lL;
+        this.rightArm = rA;
+        this.rightLeg = rL;
+        this.spine = s;
+        drawSkeleton();
         vertexGenerate();
     }
 
-    public void setSkeletonData(float[] chartData) {
-        this.chartData = chartData;
-        drawRealtimeChart();
-        vertexGenerate();
+    public void drawSkeleton (){
+        lAVert = leftArm.clone();
+        lLVert = leftLeg.clone();
+        rAVert = rightArm.clone();
+        rLVert = rightLeg.clone();
+        sVert = spine.clone();
     }
 
     public void vertexGenerate(){
         // a float has 4 bytes so we allocate for each coordinate 4 bytes
-        ByteBuffer vertexByteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
+        ByteBuffer lAByteBuffer = ByteBuffer.allocateDirect(lAVert.length * 4);
+        ByteBuffer lLByteBuffer = ByteBuffer.allocateDirect(lLVert.length * 4);
+        ByteBuffer rAByteBuffer = ByteBuffer.allocateDirect(rAVert.length * 4);
+        ByteBuffer rLByteBuffer = ByteBuffer.allocateDirect(rLVert.length * 4);
+        ByteBuffer sByteBuffer = ByteBuffer.allocateDirect(sVert.length * 4);
 
-        vertexByteBuffer.order(ByteOrder.nativeOrder());
+        lAByteBuffer.order(ByteOrder.nativeOrder());
+        lLByteBuffer.order(ByteOrder.nativeOrder());
+        rAByteBuffer.order(ByteOrder.nativeOrder());
+        rLByteBuffer.order(ByteOrder.nativeOrder());
+        sByteBuffer.order(ByteOrder.nativeOrder());
+
         // allocates the memory from the byte buffer
-        vertexBuffer = vertexByteBuffer.asFloatBuffer();
+        lABuffer = lAByteBuffer.asFloatBuffer();
+        lLBuffer = lLByteBuffer.asFloatBuffer();
+        rABuffer = rAByteBuffer.asFloatBuffer();
+        rLBuffer = rLByteBuffer.asFloatBuffer();
+        sBuffer = sByteBuffer.asFloatBuffer();
+
         // fill the vertexBuffer with the vertices
-        vertexBuffer.put(vertices);
+        lABuffer.put(lAVert);
+        lLBuffer.put(lLVert);
+        rABuffer.put(rAVert);
+        rLBuffer.put(rLVert);
+        sBuffer.put(sVert);
+
         // set the cursor position to the beginning of the buffer
-        vertexBuffer.position(0);
+        lABuffer.position(0);
+        lLBuffer.position(0);
+        rABuffer.position(0);
+        rLBuffer.position(0);
+        sBuffer.position(0);
     }
 
     public void setResolution(int width, int height){
@@ -141,12 +165,42 @@ class SignalChart {
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
         // set the color for the triangle
         gl.glColor4f(0.2f, 0.2f, 0.2f, 0.5f);
+
         // Point to vertex buffer
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);
+        gl.glVertexPointer(3, GL10.GL_FLOAT, 0,lABuffer);
         // Line width
         gl.glLineWidth(3.0f);
         // Draw the vertices as triangle strip
-        gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, vertices.length/3);
+        gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, lAVert.length/3);
+
+        // Point to vertex buffer
+        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lLBuffer);
+        // Line width
+        gl.glLineWidth(3.0f);
+        // Draw the vertices as triangle strip
+        gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, lLVert.length/3);
+
+        // Point to vertex buffer
+        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, rABuffer);
+        // Line width
+        gl.glLineWidth(3.0f);
+        // Draw the vertices as triangle strip
+        gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, rAVert.length/3);
+
+        // Point to vertex buffer
+        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, rLBuffer);
+        // Line width
+        gl.glLineWidth(3.0f);
+        // Draw the vertices as triangle strip
+        gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, rLVert.length/3);
+
+        // Point to vertex buffer
+        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, sBuffer);
+        // Line width
+        gl.glLineWidth(3.0f);
+        // Draw the vertices as triangle strip
+        gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, sVert.length/3);
+
         //Disable the client state before leaving
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
     }
