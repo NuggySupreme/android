@@ -11,6 +11,12 @@ public class ChartGLSurfaceView extends GLSurfaceView{
     private final ChartGLRenderer chartRenderer;
     private float[] datapoints = new float[150];
 
+    private float[] leftArm = new float[12];
+    private float[] rightArm = new float[12];
+    private float[] leftLeg =  new float[12];
+    private float[] rightLeg = new float[12];
+    private float[] spine = new float[6];
+
     boolean isUpdating = false;
     public RenderThread requestRender;
 
@@ -48,8 +54,17 @@ public class ChartGLSurfaceView extends GLSurfaceView{
         }
     }
 
-    public float[] getChartData() {
-        return this.datapoints;
+    public void setSkeletonData(float[] la, float[] ll, float[] ra, float[] rl, float[] spine) {
+        if (la.length * ll.length * ra.length * rl.length > 0){
+            isUpdating = true;
+            this.leftArm = la.clone();
+            this.rightArm = ra.clone();
+            this.leftLeg = ll.clone();
+            this.rightLeg = rl.clone();
+            this.spine = spine.clone();
+            isUpdating = false;
+            Log.i("info", "updated skeleton info");
+        }
     }
 
     class RenderThread extends Thread {
@@ -61,7 +76,7 @@ public class ChartGLSurfaceView extends GLSurfaceView{
                     requestRender();
                 }
                 try {
-                    Thread.sleep(15);
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

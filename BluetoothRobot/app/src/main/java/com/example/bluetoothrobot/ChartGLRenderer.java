@@ -15,6 +15,7 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
 
     private final SignalChart sineChart = new SignalChart();
     public volatile float[] chartData = new float[400];
+    private
     int width;
     int height;
     Context context;
@@ -104,6 +105,12 @@ class SignalChart {
     }
 
     public void setChartData(float[] chartData) {
+        this.chartData = chartData;
+        drawRealtimeChart();
+        vertexGenerate();
+    }
+
+    public void setSkeletonData(float[] chartData) {
         this.chartData = chartData;
         drawRealtimeChart();
         vertexGenerate();

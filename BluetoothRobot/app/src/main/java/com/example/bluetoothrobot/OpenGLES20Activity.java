@@ -8,14 +8,9 @@ import android.os.Handler;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.snackbar.Snackbar;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.Random;
 import java.util.UUID;
 
 public class OpenGLES20Activity extends AppCompatActivity {
@@ -98,22 +93,91 @@ public class OpenGLES20Activity extends AppCompatActivity {
         }
     }
 
+    private float[] createLeftArm(String[] p) {
+        float[] toReturn = new float[12];
+        int j = 0;
+
+        for(int i = 10; i <= 16; i++) {
+            toReturn[j] = Float.parseFloat(p[3*i]);
+            toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
+            toReturn[j + 2] = Float.parseFloat(p[3*i + 2]);
+            j += 3;
+
+            if(i == 10) {
+                i += 3; //skip to joint 14
+            }
+        }
+        return toReturn;
+    }
+
+    private float[] createLeftLeg(String[] p) {
+        float[] toReturn = new float[12];
+        int j = 0;
+        for(int i = 1; i <= 9; i++) {
+            toReturn[j] = Float.parseFloat(p[3 * i]);
+            toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
+            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            j += 3;
+            if(i == 1) {
+                i += 4; //skip to joint 6
+            }
+        }
+        return toReturn;
+    }
+
+    private float[] createRightArm(String[] p) {
+        float[] toReturn = new float[12];
+        int j = 0;
+        for(int i = 10; i <= 13; i++) {
+            toReturn[j] = Float.parseFloat(p[3 * i]);
+            toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
+            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            j += 3;
+        }
+        return toReturn;
+    }
+
+    private float[] createRightLeg(String[] p) {
+        float[] toReturn = new float[12];
+        int j = 0;
+        for(int i = 1; i <= 5; i++) {
+            toReturn[j] = Float.parseFloat(p[3 * i]);
+            toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
+            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            j += 3;
+        }
+        return toReturn;
+    }
+
+    private float[] createSpine(String[] p) {
+        float[] toReturn = new float[6];
+        toReturn[0] = Float.parseFloat(p[3]);
+        toReturn[1] = Float.parseFloat(p[4]);
+        toReturn[2] = Float.parseFloat(p[5]);
+        toReturn[3] = Float.parseFloat(p[30]);
+        toReturn[4] = Float.parseFloat(p[31]);
+        toReturn[5] = Float.parseFloat(p[32]);
+        return toReturn;
+    }
     private class ReadThread extends Thread { //Gets input from robot
 
         @Override
         public void run() {
             while(!isInterrupted()) {
                 try {
-                    final String message = fromRobot.readLine(); //get message from robot
+                    String message = fromRobot.readLine(); //get message from robot
                     Log.i("info", "got data" + message);
                     if (message != null && message.startsWith("DATA:")) { //if the message is not empty
-                        float[] data = gLView.getChartData();
-                        for (int i = 1; i < data.length - 2; i += 2) {
-                            data[i] = data[i + 2];
-                        }
-                        String val = message.substring(5);
-                        data[data.length - 1] = Float.parseFloat(val);
-                        gLView.setChartData(data);
+                        message = message.substring(5);
+                        String[] points = message.split(",");
+
+                        float[] lA = createLeftArm(points);
+                        float[] lL = createLeftLeg(points);
+                        float[] rA = createRightArm(points);
+                        float[] rL = createRightLeg(points);
+                        float[] spine = createSpine(points);
+
+                        gLView.setSkeletonData(lA, lL, rA, rL, spine);
                         customHandler.postDelayed(this, 0);
                     }
                 } catch (IOException e) {
