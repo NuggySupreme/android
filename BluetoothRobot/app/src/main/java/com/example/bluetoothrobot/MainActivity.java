@@ -117,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         btnSwitch.setOnClickListener(v -> {
             Intent GLIntent = new Intent(getApplicationContext(), OpenGLES20Activity.class);
             GLIntent.putExtra("btDevice", robot);
+            closeConnection();
             startActivity(GLIntent);
         });
     }
@@ -125,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         if (robot != null) { //if we are coming in from OpenGLActivity with an already found robot
+            Log.i("Info", "got bluetooth connection");
             (new ConnectThread()).start();
         }
     }
@@ -139,11 +141,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void closeConnection() {
         try {
-            if(toRobot != null) {
-                toRobot.close();
+            if(robot != null) {
+                robot = null;
             }
             if(robotConnection != null) {
                 robotConnection.close();
+            }
+            if(toRobot != null) {
+                toRobot.close();
             }
         } catch(Exception e) {
             Log.e("Error", "connection closing error");
