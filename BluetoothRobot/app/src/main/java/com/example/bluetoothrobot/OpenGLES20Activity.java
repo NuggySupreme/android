@@ -38,7 +38,6 @@ public class OpenGLES20Activity extends AppCompatActivity {
         }
 
         gLView = new ChartGLSurfaceView(this);
-        gLView.setEGLContextClientVersion(2);
         setContentView(gLView);
     }
 
@@ -98,13 +97,13 @@ public class OpenGLES20Activity extends AppCompatActivity {
         float[] toReturn = new float[12];
         int j = 0;
 
-        for(int i = 10; i <= 16; i++) {
+        for(int i = 9; i <= 15; i++) {
             toReturn[j] = Float.parseFloat(p[3*i]);
             toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
             toReturn[j + 2] = Float.parseFloat(p[3*i + 2]);
             j += 3;
 
-            if(i == 10) {
+            if(i == 9) {
                 i += 3; //skip to joint 14
             }
         }
@@ -112,14 +111,14 @@ public class OpenGLES20Activity extends AppCompatActivity {
     }
 
     private float[] createLeftLeg(String[] p) {
-        float[] toReturn = new float[12];
+        float[] toReturn = new float[15];
         int j = 0;
-        for(int i = 1; i <= 9; i++) {
+        for(int i = 0; i <= 8; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
             toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
-            if(i == 1) {
+            if(i == 0) {
                 i += 4; //skip to joint 6
             }
         }
@@ -129,7 +128,7 @@ public class OpenGLES20Activity extends AppCompatActivity {
     private float[] createRightArm(String[] p) {
         float[] toReturn = new float[12];
         int j = 0;
-        for(int i = 10; i <= 13; i++) {
+        for(int i = 9; i <= 12; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
             toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
@@ -139,9 +138,9 @@ public class OpenGLES20Activity extends AppCompatActivity {
     }
 
     private float[] createRightLeg(String[] p) {
-        float[] toReturn = new float[12];
+        float[] toReturn = new float[15];
         int j = 0;
-        for(int i = 1; i <= 5; i++) {
+        for(int i = 0; i <= 4; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
             toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
@@ -152,12 +151,12 @@ public class OpenGLES20Activity extends AppCompatActivity {
 
     private float[] createSpine(String[] p) {
         float[] toReturn = new float[6];
-        toReturn[0] = Float.parseFloat(p[3]);
-        toReturn[1] = Float.parseFloat(p[4]);
-        toReturn[2] = Float.parseFloat(p[5]);
-        toReturn[3] = Float.parseFloat(p[30]);
-        toReturn[4] = Float.parseFloat(p[31]);
-        toReturn[5] = Float.parseFloat(p[32]);
+        toReturn[0] = Float.parseFloat(p[0]);
+        toReturn[1] = Float.parseFloat(p[1]);
+        toReturn[2] = Float.parseFloat(p[2]);
+        toReturn[3] = Float.parseFloat(p[27]);
+        toReturn[4] = Float.parseFloat(p[28]);
+        toReturn[5] = Float.parseFloat(p[29]);
         return toReturn;
     }
     private class ReadThread extends Thread { //Gets input from robot
@@ -167,7 +166,7 @@ public class OpenGLES20Activity extends AppCompatActivity {
             while(!isInterrupted()) {
                 try {
                     String message = fromRobot.readLine(); //get message from robot
-                    Log.i("info", "got data" + message);
+                    Log.i("info", "got " + message);
                     if (message != null && message.startsWith("DATA:")) { //if the message is not empty
                         message = message.substring(5);
                         String[] points = message.split(",");
@@ -178,7 +177,47 @@ public class OpenGLES20Activity extends AppCompatActivity {
                         float[] rL = createRightLeg(points);
                         float[] spine = createSpine(points);
 
-                        gLView.setSkeletonData(lA, lL, rA, rL, spine);
+                        float[] maxVal = {Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE};
+                        float[] minVal = {Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE};
+
+                        for(int i = 0; i < 15; i++) {
+                            float max = Float.MIN_VALUE;
+                            float min = Float.MAX_VALUE;
+                            if(i < lA.length) {
+                                max = Math.max(lA[i], max);
+                                min = Math.min(lA[i], min);
+                            }
+                            if(i < lL.length) {
+                                max = Math.max(lL[i], max);
+                                min = Math.min(lL[i], min);
+                            }
+                            if(i < rA.length) {
+                                max = Math.max(rA[i], max);
+                                min = Math.min(rA[i], min);
+                            }
+                            if(i < rL.length) {
+                                max = Math.max(rL[i], max);
+                                min = Math.min(rL[i], min);
+                            }
+                            if(i < spine.length) {
+                                max = Math.max(spine[i], max);
+                                min = Math.min(spine[i], min);
+                            }
+                            switch(i % 3) {
+                                case 0:
+                                    maxVal[0] = max;
+                                    minVal[0] = min;
+                                    break;
+                                case 1:
+                                    maxVal[1] = max;
+                                    minVal[1] = min;
+                                    break;
+                                case 2:
+                                    maxVal[2] = max;
+                                    minVal[2] = min;
+                            }
+                        }
+                        gLView.setSkeletonData(lA, lL, rA, rL, spine, maxVal, minVal);
                         customHandler.postDelayed(this, 0);
                     }
                 } catch (IOException e) {

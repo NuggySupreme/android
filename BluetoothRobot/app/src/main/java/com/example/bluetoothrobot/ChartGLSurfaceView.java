@@ -12,9 +12,11 @@ public class ChartGLSurfaceView extends GLSurfaceView{
 
     private float[] leftArm = new float[12];
     private float[] rightArm = new float[12];
-    private float[] leftLeg =  new float[12];
-    private float[] rightLeg = new float[12];
+    private float[] leftLeg =  new float[15];
+    private float[] rightLeg = new float[15];
     private float[] spine = new float[6];
+    private float[] maxVal = new float[3];
+    private float[] minVal = new float[3];
 
     boolean isUpdating = false;
     public RenderThread requestRender;
@@ -28,15 +30,15 @@ public class ChartGLSurfaceView extends GLSurfaceView{
 
         // Render the view only when there is a change in the drawing data
         // Set the Renderer for drawing on the GLSurfaceView
-        requestRender = new RenderThread();
-        requestRender.start();
-
         chartRenderer = new ChartGLRenderer(context);
         setRenderer(chartRenderer);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+
+        requestRender = new RenderThread();
+        requestRender.start();
     }
 
-    public void setSkeletonData(float[] la, float[] ll, float[] ra, float[] rl, float[] spine) {
+    public void setSkeletonData(float[] la, float[] ll, float[] ra, float[] rl, float[] spine, float[] maxVal, float[] minVal) {
         if (la.length * ll.length * ra.length * rl.length > 0){
             isUpdating = true;
             this.leftArm = la.clone();
@@ -44,7 +46,8 @@ public class ChartGLSurfaceView extends GLSurfaceView{
             this.leftLeg = ll.clone();
             this.rightLeg = rl.clone();
             this.spine = spine.clone();
-            Log.i("info", "updated skeleton info");
+            this.maxVal = maxVal;
+            this.minVal = minVal;
             isUpdating = false;
         }
     }
@@ -59,6 +62,12 @@ public class ChartGLSurfaceView extends GLSurfaceView{
                     chartRenderer.rightArmData = rightArm;
                     chartRenderer.rightLegData = rightLeg;
                     chartRenderer.spineData = spine;
+                    chartRenderer.maxX = maxVal[0];
+                    chartRenderer.maxY = maxVal[1];
+                    chartRenderer.maxZ = maxVal[2];
+                    chartRenderer.minX = minVal[0];
+                    chartRenderer.minY = minVal[1];
+                    chartRenderer.minZ = minVal[2];
                     requestRender();
                 }
                 try {

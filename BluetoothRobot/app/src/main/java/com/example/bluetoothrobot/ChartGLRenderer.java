@@ -10,18 +10,23 @@ import javax.microedition.khronos.opengles.GL10;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
-import android.opengl.GLES20;
 
 public class ChartGLRenderer implements GLSurfaceView.Renderer {
 
     private final Skeleton skeleton = new Skeleton();
 
     public volatile float[] leftArmData = new float[12];
-    public volatile float[] leftLegData = new float[12];
+    public volatile float[] leftLegData = new float[15];
     public volatile float[] rightArmData = new float[12];
-    public volatile float[] rightLegData = new float[12];
+    public volatile float[] rightLegData = new float[15];
     public volatile float[] spineData = new float[6];
 
+    public float maxX = 0.0f;
+    public float maxY = 0.0f;
+    public float maxZ = 0.0f;
+    public float minX = 0.0f;
+    public float minY = 0.0f;
+    public float minZ = 0.0f;
     int width;
     int height;
     Context context;
@@ -35,12 +40,14 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl) {
 
         // clear Screen and Depth Buffer
-        GLES20.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
         // Reset the Modelview Matrix
+        gl.glMatrixMode(GL10.GL_MODELVIEW);
         gl.glLoadIdentity();
         // Drawing
         //Log.d("Chart Ratio1 "," width " +width + " H " + height);
-        gl.glTranslatef(0.0f, 0.0f, -5.0f); // move the camera 5 units away
+
+
         skeleton.setResolution(width, height);
         skeleton.setSkeletonData(leftArmData, leftLegData, rightArmData, rightLegData, spineData);
         skeleton.draw(gl);
@@ -54,35 +61,34 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
         if(height == 0) {                       //Prevent A Divide By Zero By
             height = 1;                         //Making Height Equal One
         }
-        GLES20.glViewport(0, 0, width, height);     //Reset The Current Viewport
-        gl.glMatrixMode(GL10.GL_PROJECTION);    //Select The Projection Matrix
+        gl.glViewport(0, 0, width, height);     //Reset The Current Viewport
+        gl.glMatrixMode(gl.GL_PROJECTION);    //Select The Projection Matrix
         gl.glLoadIdentity();                    //Reset The Projection Matrix
-
+        GLU.gluPerspective();
         //Calculate The Aspect Ratio Of The Window
         //Log.d("Chart Ratio2 "," width " +width + " H " + height);
-        GLU.gluPerspective(gl, 45.0f, (float) height * 2.0f/(float)width, 0.1f, 100.0f);
         gl.glMatrixMode(GL10.GL_MODELVIEW);     //Select The Modelview Matrix
         gl.glLoadIdentity();                    //Reset The Modelview Matrix
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
 
 class Skeleton {
     public float[] leftArm = new float[12];
-    public float[] leftLeg = new float[12];
+    public float[] leftLeg = new float[15];
     public float[] rightArm = new float[12];
-    public float[] rightLeg = new float[12];
+    public float[] rightLeg = new float[15];
     public float[] spine = new float[6];
 
 
     private float[] lAVert = new float[12];
-    private float[] lLVert = new float[12];
+    private float[] lLVert = new float[15];
     private float[] rAVert = new float[12];
-    private float[] rLVert = new float[12];
+    private float[] rLVert = new float[15];
     private float[] sVert = new float[12];
 
     private FloatBuffer lABuffer;
