@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         btnClose.setOnClickListener(v -> closeConnection());
 
         btnSwitch.setOnClickListener(v -> {
-            Intent GLIntent = new Intent(getApplicationContext(), OpenGLES20Activity.class);
+            Intent GLIntent = new Intent(getApplicationContext(), SkeletonGLES20Activity.class);
             GLIntent.putExtra("btDevice", robot);
             closeConnection();
             startActivity(GLIntent);

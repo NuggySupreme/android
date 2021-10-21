@@ -46,7 +46,7 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
         gl.glLoadIdentity();
         // Drawing
         //Log.d("Chart Ratio1 "," width " +width + " H " + height);
-
+        gl.glTranslatef(0f, 0f, -3f);
 
         skeleton.setResolution(width, height);
         skeleton.setSkeletonData(leftArmData, leftLegData, rightArmData, rightLegData, spineData);
@@ -64,7 +64,6 @@ public class ChartGLRenderer implements GLSurfaceView.Renderer {
         gl.glViewport(0, 0, width, height);     //Reset The Current Viewport
         gl.glMatrixMode(gl.GL_PROJECTION);    //Select The Projection Matrix
         gl.glLoadIdentity();                    //Reset The Projection Matrix
-        GLU.gluPerspective();
         //Calculate The Aspect Ratio Of The Window
         //Log.d("Chart Ratio2 "," width " +width + " H " + height);
         gl.glMatrixMode(GL10.GL_MODELVIEW);     //Select The Modelview Matrix
@@ -89,7 +88,7 @@ class Skeleton {
     private float[] lLVert = new float[15];
     private float[] rAVert = new float[12];
     private float[] rLVert = new float[15];
-    private float[] sVert = new float[12];
+    private float[] sVert = new float[6];
 
     private FloatBuffer lABuffer;
     private FloatBuffer lLBuffer;
