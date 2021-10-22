@@ -100,7 +100,7 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
         for(int i = 9; i <= 15; i++) {
             toReturn[j] = Float.parseFloat(p[3*i]);
             toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
-            toReturn[j + 2] = Float.parseFloat(p[3*i + 2]);
+            //toReturn[j + 2] = Float.parseFloat(p[3*i + 2]);
             j += 3;
 
             if(i == 9) {
@@ -116,7 +116,7 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
         for(int i = 0; i <= 8; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
-            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
             if(i == 0) {
                 i += 4; //skip to joint 6
@@ -131,7 +131,7 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
         for(int i = 9; i <= 12; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
-            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
         }
         return toReturn;
@@ -143,7 +143,7 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
         for(int i = 0; i <= 4; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
-            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
         }
         return toReturn;
@@ -153,10 +153,10 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
         float[] toReturn = new float[6];
         toReturn[0] = Float.parseFloat(p[0]);
         toReturn[1] = Float.parseFloat(p[1]);
-        toReturn[2] = Float.parseFloat(p[2]);
+        //toReturn[2] = Float.parseFloat(p[2]);
         toReturn[3] = Float.parseFloat(p[27]);
         toReturn[4] = Float.parseFloat(p[28]);
-        toReturn[5] = Float.parseFloat(p[29]);
+        //toReturn[5] = Float.parseFloat(p[29]);
         return toReturn;
     }
     private class ReadThread extends Thread { //Gets input from robot
@@ -166,7 +166,6 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
             while(!isInterrupted()) {
                 try {
                     String message = fromRobot.readLine(); //get message from robot
-                    Log.i("info", "got " + message);
                     if (message != null && message.startsWith("DATA:")) { //if the message is not empty
                         message = message.substring(5);
                         String[] points = message.split(",");
@@ -180,45 +179,40 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
                         float[] maxVal = {Float.MIN_VALUE, Float.MIN_VALUE, Float.MIN_VALUE};
                         float[] minVal = {Float.MAX_VALUE, Float.MAX_VALUE, Float.MAX_VALUE};
 
-                        for(int i = 0; i < 15; i++) {
-                            float max = Float.MIN_VALUE;
-                            float min = Float.MAX_VALUE;
+                        for(int i = 0; i < max(lA.length, lL.length, rA.length, rL.length, spine.length); i += 3) {
                             if(i < lA.length) {
-                                max = Math.max(lA[i], max);
-                                min = Math.min(lA[i], min);
+                                minVal[0] = Math.min(minVal[0], lA[i]);
+                                maxVal[0] = Math.max(maxVal[0], lA[i]);
+                                minVal[1] = Math.min(minVal[1], lA[i + 1]);
+                                maxVal[1] = Math.max(maxVal[1], lA[i + 1]);
                             }
                             if(i < lL.length) {
-                                max = Math.max(lL[i], max);
-                                min = Math.min(lL[i], min);
+                                minVal[0] = Math.min(minVal[0], lL[i]);
+                                maxVal[0] = Math.max(maxVal[0], lL[i]);
+                                minVal[1] = Math.min(minVal[1], lL[i + 1]);
+                                maxVal[1] = Math.max(maxVal[1], lL[i + 1]);
                             }
                             if(i < rA.length) {
-                                max = Math.max(rA[i], max);
-                                min = Math.min(rA[i], min);
+                                minVal[0] = Math.min(minVal[0], rA[i]);
+                                maxVal[0] = Math.max(maxVal[0], rA[i]);
+                                minVal[1] = Math.min(minVal[1], rA[i + 1]);
+                                maxVal[1] = Math.max(maxVal[1], rA[i + 1]);
                             }
                             if(i < rL.length) {
-                                max = Math.max(rL[i], max);
-                                min = Math.min(rL[i], min);
+                                minVal[0] = Math.min(minVal[0], rL[i]);
+                                maxVal[0] = Math.max(maxVal[0], rL[i]);
+                                minVal[1] = Math.min(minVal[1], rL[i + 1]);
+                                maxVal[1] = Math.max(maxVal[1], rL[i + 1]);
                             }
                             if(i < spine.length) {
-                                max = Math.max(spine[i], max);
-                                min = Math.min(spine[i], min);
-                            }
-
-                            switch(i % 3) {
-                                case 0:
-                                    maxVal[0] = max;
-                                    minVal[0] = min;
-                                    break;
-                                case 1:
-                                    maxVal[1] = max;
-                                    minVal[1] = min;
-                                    break;
-                                case 2:
-                                    maxVal[2] = max;
-                                    minVal[2] = min;
+                                minVal[0] = Math.min(minVal[0], spine[i]);
+                                maxVal[0] = Math.max(maxVal[0], spine[i]);
+                                minVal[1] = Math.min(minVal[1], spine[i + 1]);
+                                maxVal[1] = Math.max(maxVal[1], spine[i + 1]);
                             }
                         }
-                        gLView.setSkeletonData(lA, lL, rA, rL, spine, maxVal, minVal);
+
+                        gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
                         customHandler.postDelayed(this, 0);
                     }
                 } catch (IOException e) {
@@ -228,5 +222,14 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public static int max(int a, int b, int c, int d, int e) {
+        int max = a;
+        max = Math.max(max, b);
+        max = Math.max(max, c);
+        max = Math.max(max, d);
+        max = Math.max(max, e);
+        return max;
     }
 }

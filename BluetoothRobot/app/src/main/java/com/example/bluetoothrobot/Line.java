@@ -8,7 +8,7 @@ import java.nio.FloatBuffer;
 
 public class Line {
     private FloatBuffer vertexBuffer;
-    private float[] vertices; //L/R U/D I/O
+    private float[] vertices = {-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f}; //L/R U/D I/O
     private float[] color = {0.0f, 0.0f, 0.0f, 1.0f};
 
     private final String vertexShaderCode =
@@ -31,6 +31,23 @@ public class Line {
         GLES20.glShaderSource(shader, shaderCode);
         GLES20.glCompileShader(shader);
         return shader;
+    }
+
+    public Line() {
+        ByteBuffer bb = ByteBuffer.allocateDirect(vertices.length * 4);
+        bb.order(ByteOrder.nativeOrder());
+
+        vertexBuffer = bb.asFloatBuffer(); //turn into float buffer
+        vertexBuffer.put(vertices); //put vertices into buffer
+        vertexBuffer.position(0); //read from beginning
+
+        int vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+        int fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+
+        shaderProgram = GLES20.glCreateProgram();
+        GLES20.glAttachShader(shaderProgram, vertexShader);
+        GLES20.glAttachShader(shaderProgram, fragmentShader);
+        GLES20.glLinkProgram(shaderProgram);
     }
 
     public Line(int length) {
