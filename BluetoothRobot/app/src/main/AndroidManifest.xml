@@ -24,6 +24,10 @@
             android:name=".OpenGLES20Activity"
             android:parentActivityName=".MainActivity"
             android:exported="true" />
+        <activity
+            android:name=".SkeletonGLES20Activity"
+            android:parentActivityName=".MainActivity"
+            android:exported="true" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

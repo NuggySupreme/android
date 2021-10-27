@@ -24,6 +24,7 @@ public class ChartGLSurfaceView extends GLSurfaceView{
     public ChartGLSurfaceView(Context context) {
         super(context);
 
+        setEGLContextClientVersion(2);
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         this.setZOrderOnTop(true);
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
