@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="server_ip">Server IP</string>
+    <string name="message">Message</string>
+    <string name="send">SEND</string>
+    <string name="close">CLOSE</string>
+    <string name="connect">CONNECT</string>
 </resources>
