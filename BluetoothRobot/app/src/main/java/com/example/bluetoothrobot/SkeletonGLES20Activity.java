@@ -95,31 +95,29 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
 
     private float[] createLeftArm(String[] p) {
         float[] toReturn = new float[12];
-        int j = 0;
 
-        for(int i = 9; i <= 15; i++) {
+        int j = 0;
+        for(int i = 2; i < 9; i++) {
             toReturn[j] = Float.parseFloat(p[3*i]);
             toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
-            //toReturn[j + 2] = Float.parseFloat(p[3*i + 2]);
-            j += 3;
-
-            if(i == 9) {
-                i += 3; //skip to joint 14
+            if(i == 2) {
+                i += 3;
             }
+            j += 3;
         }
         return toReturn;
     }
 
     private float[] createLeftLeg(String[] p) {
-        float[] toReturn = new float[15];
+        float[] toReturn = new float[12];
         int j = 0;
-        for(int i = 0; i <= 8; i++) {
+        for(int i = 5; i < 15; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
             //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
-            if(i == 0) {
-                i += 4; //skip to joint 6
+            if(i == 5) {
+                i += 6; //skip to joint 6
             }
         }
         return toReturn;
@@ -127,36 +125,41 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
 
     private float[] createRightArm(String[] p) {
         float[] toReturn = new float[12];
+
         int j = 0;
-        for(int i = 9; i <= 12; i++) {
-            toReturn[j] = Float.parseFloat(p[3 * i]);
-            toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
-            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+        for(int i = 2; i < 12; i++) {
+            toReturn[j] = Float.parseFloat(p[3*i]);
+            toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
+            if(i == 2) {
+                i += 6;
+            }
             j += 3;
         }
         return toReturn;
     }
 
     private float[] createRightLeg(String[] p) {
-        float[] toReturn = new float[15];
+        float[] toReturn = new float[12];
         int j = 0;
-        for(int i = 0; i <= 4; i++) {
+        for(int i = 5; i < 18; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
             //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
+            if(i == 5) {
+                i += 9; //skip to joint 6
+            }
         }
         return toReturn;
     }
 
     private float[] createSpine(String[] p) {
-        float[] toReturn = new float[6];
-        toReturn[0] = Float.parseFloat(p[0]);
-        toReturn[1] = Float.parseFloat(p[1]);
-        //toReturn[2] = Float.parseFloat(p[2]);
-        toReturn[3] = Float.parseFloat(p[27]);
-        toReturn[4] = Float.parseFloat(p[28]);
-        //toReturn[5] = Float.parseFloat(p[29]);
+        float[] toReturn = new float[18];
+
+        for(int i = 0; i < 6; i++) {
+            toReturn[3*i] = Float.parseFloat(p[3*i]);
+            toReturn[3*i + 1] = Float.parseFloat(p[3*i + 1]);
+        }
         return toReturn;
     }
     private class ReadThread extends Thread { //Gets input from robot
@@ -166,7 +169,7 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
             while(!isInterrupted()) {
                 try {
                     String message = fromRobot.readLine(); //get message from robot
-                    if (message != null && message.startsWith("DATA:")) { //if the message is not empty
+                    if (message.startsWith("DATA:")) { //if the message is not empt
                         message = message.substring(5);
                         String[] points = message.split(",");
 
@@ -212,6 +215,7 @@ public class SkeletonGLES20Activity extends AppCompatActivity {
                             }
                         }
 
+                        System.out.println(maxVal[0]);
                         gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
                         customHandler.postDelayed(this, 0);
                     }

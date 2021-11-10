@@ -64,10 +64,10 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         lA = new Line(12);
-        lL = new Line(15);
+        lL = new Line(12);
         rA = new Line(12);
-        rL = new Line(15);
-        spine = new Line(6);
+        rL = new Line(12);
+        spine = new Line(18);
     }
 
     public void setVertices(float[] min, float[] max, float[] la, float[] ll, float[] ra, float[] rl, float[] s) {
