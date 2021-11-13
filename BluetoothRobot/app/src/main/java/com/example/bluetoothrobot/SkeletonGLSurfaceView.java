@@ -12,7 +12,7 @@ public class SkeletonGLSurfaceView extends GLSurfaceView{
     public SkeletonGLSurfaceView(Context context) {
         super(context);
 
-        setEGLContextClientVersion(2);
+        setEGLContextClientVersion(3);
         setEGLConfigChooser(8, 8, 8, 8, 16, 0);
         this.setZOrderOnTop(true);
         getHolder().setFormat(PixelFormat.TRANSLUCENT);

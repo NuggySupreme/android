@@ -1,7 +1,7 @@
 package com.example.bluetoothrobot;
 
 import android.content.Context;
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
@@ -38,8 +38,8 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        GLES30.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
 
         //Autoscales the model to fit in the window if it is centered at the origin
         Matrix.frustumM(projectionMatrix, 0, minX - (0.1f * Math.abs(cX)), maxX + (0.1f * Math.abs(cX)), minY - (0.1f * Math.abs(cY)), maxY + (0.1f * Math.abs(cY)), 3, 7);
@@ -48,15 +48,15 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
         Matrix.setLookAtM(viewMatrix, 0, 0, 0, 3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
         Matrix.multiplyMM(vpMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
         lA.draw(vpMatrix);
-        lL.draw(vpMatrix);
-        rA.draw(vpMatrix);
-        rL.draw(vpMatrix);
-        spine.draw(vpMatrix);
+        //lL.draw(vpMatrix);
+        //rA.draw(vpMatrix);
+        //rL.draw(vpMatrix);
+        //spine.draw(vpMatrix);
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        GLES20.glViewport(0, 0, width, height);
+        GLES30.glViewport(0, 0, width, height);
         float ratio = (float) width/height;
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
     }
