@@ -340,10 +340,12 @@ public class JoystickView extends View
     protected void onDraw(Canvas canvas) {
         // Draw the background
         canvas.drawCircle(mFixedCenterX, mFixedCenterY, mBackgroundRadius, mPaintBackground);
-
+        mPaintCircleButton.setStyle(Paint.Style.STROKE);
+        mPaintCircleButton.setStrokeWidth(10);
+        canvas.drawCircle(mFixedCenterX, mFixedCenterY, mBorderRadius, mPaintCircleButton);
+        mPaintCircleButton.setStyle(Paint.Style.FILL);
         // Draw the circle border
         canvas.drawCircle(mFixedCenterX, mFixedCenterY, mBorderRadius, mPaintCircleBorder);
-
         // Draw the button from image
         if (mButtonBitmap != null) {
             canvas.drawBitmap(

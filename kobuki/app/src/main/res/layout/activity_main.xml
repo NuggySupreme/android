@@ -2,61 +2,71 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id = "@+id/activity_main"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".MainActivity">
 
     <com.example.kobukirobot.JoystickView
         android:id="@+id/joystickView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="432dp"
+        android:layout_height="308dp"
+        android:layout_marginTop="84dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sensorPanel" />
+
+    <TextView
+        android:id="@+id/sensorPanel"
+        android:layout_width="347dp"
+        android:layout_height="197dp"
+        android:lines="3"
+        android:text="TextView"
+        android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        tools:layout_editor_absoluteY="16dp" />
 
     <EditText
         android:id="@+id/msg"
-        android:layout_width="342dp"
-        android:layout_height="70dp"
+        android:layout_width="252dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="4dp"
         android:layout_marginBottom="4dp"
+        android:autofillHints="true"
         android:ems="10"
         android:hint="@string/message"
         android:inputType="textShortMessage|textLongMessage|text"
+        android:lines="4"
+        android:singleLine="false"
+        android:textColor="@android:color/black"
+        android:textColorHint="@color/hint_text"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:autofillHints="true" />
+        app:layout_constraintEnd_toStartOf="@+id/btnSend"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btnSend"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
         android:text="@string/send"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/msg" />
-
-    <Button
-        android:id="@+id/btnConnect"
-        android:layout_width="124dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="4dp"
-        android:text="@string/connect"
-        app:layout_constraintEnd_toStartOf="@+id/btnClose"
-        app:layout_constraintHorizontal_bias="0.364"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/btnClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="76dp"
+        android:layout_marginTop="236dp"
         android:text="@string/close"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
 
