@@ -125,37 +125,37 @@ class Skeleton {
     public void vertexGenerate(){
         // a float has 4 bytes so we allocate for each coordinate 4 bytes
         ByteBuffer lAByteBuffer = ByteBuffer.allocateDirect(lAVert.length * 4);
-        ByteBuffer lLByteBuffer = ByteBuffer.allocateDirect(lLVert.length * 4);
+        /*ByteBuffer lLByteBuffer = ByteBuffer.allocateDirect(lLVert.length * 4);
         ByteBuffer rAByteBuffer = ByteBuffer.allocateDirect(rAVert.length * 4);
         ByteBuffer rLByteBuffer = ByteBuffer.allocateDirect(rLVert.length * 4);
-        ByteBuffer sByteBuffer = ByteBuffer.allocateDirect(sVert.length * 4);
+        ByteBuffer sByteBuffer = ByteBuffer.allocateDirect(sVert.length * 4); */
 
         lAByteBuffer.order(ByteOrder.nativeOrder());
-        lLByteBuffer.order(ByteOrder.nativeOrder());
+        /*lLByteBuffer.order(ByteOrder.nativeOrder());
         rAByteBuffer.order(ByteOrder.nativeOrder());
         rLByteBuffer.order(ByteOrder.nativeOrder());
-        sByteBuffer.order(ByteOrder.nativeOrder());
+        sByteBuffer.order(ByteOrder.nativeOrder()); */
 
         // allocates the memory from the byte buffer
         lABuffer = lAByteBuffer.asFloatBuffer();
-        lLBuffer = lLByteBuffer.asFloatBuffer();
+        /*lLBuffer = lLByteBuffer.asFloatBuffer();
         rABuffer = rAByteBuffer.asFloatBuffer();
         rLBuffer = rLByteBuffer.asFloatBuffer();
-        sBuffer = sByteBuffer.asFloatBuffer();
+        sBuffer = sByteBuffer.asFloatBuffer(); */
 
         // fill the vertexBuffer with the vertices
         lABuffer.put(lAVert);
-        lLBuffer.put(lLVert);
+        /*lLBuffer.put(lLVert);
         rABuffer.put(rAVert);
         rLBuffer.put(rLVert);
-        sBuffer.put(sVert);
+        sBuffer.put(sVert); */
 
         // set the cursor position to the beginning of the buffer
         lABuffer.position(0);
-        lLBuffer.position(0);
+        /*lLBuffer.position(0);
         rABuffer.position(0);
         rLBuffer.position(0);
-        sBuffer.position(0);
+        sBuffer.position(0); */
     }
 
     public void setResolution(int width, int height){
@@ -179,7 +179,7 @@ class Skeleton {
         gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, lAVert.length/3);
 
         // Point to vertex buffer
-        gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lLBuffer);
+       /* gl.glVertexPointer(3, GL10.GL_FLOAT, 0, lLBuffer);
         // Line width
         gl.glLineWidth(3.0f);
         // Draw the vertices as triangle strip
@@ -204,7 +204,7 @@ class Skeleton {
         // Line width
         gl.glLineWidth(3.0f);
         // Draw the vertices as triangle strip
-        gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, sVert.length/3);
+        gl.glDrawArrays(GL10.GL_LINE_STRIP, 0, sVert.length/3); */
 
         //Disable the client state before leaving
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
