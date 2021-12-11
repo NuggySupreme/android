@@ -12,7 +12,7 @@
         android:id="@+id/joystickView"
         android:layout_width="432dp"
         android:layout_height="308dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,14 +20,13 @@
 
     <TextView
         android:id="@+id/sensorPanel"
-        android:layout_width="347dp"
-        android:layout_height="197dp"
-        android:layout_marginBottom="28dp"
-        android:lines="3"
-        android:text="TextView"
-        android:textSize="24sp"
+        android:layout_width="342dp"
+        android:layout_height="194dp"
+        android:layout_marginBottom="20dp"
+        android:textSize="18sp"
         app:layout_constraintBottom_toTopOf="@+id/btnClose"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
@@ -63,7 +62,7 @@
         android:id="@+id/btnClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="252dp"
+        android:layout_marginTop="236dp"
         android:text="@string/close"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

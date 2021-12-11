@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private ReadThread read = null; //reading thread to prevent UI blocking
     private PrintWriter toRobot = null; //output stream for socket
     private TextView etSensors; //message log
+    private EditText etMessage;
 
     private boolean joystickResting = false;
     private boolean connected = false;
@@ -37,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         etSensors = findViewById(R.id.sensorPanel);
-        EditText etMessage = findViewById(R.id.msg);
+        etSensors.setText("");
+        etMessage = findViewById(R.id.msg);
         btnSend = findViewById(R.id.btnSend);
         Button btnClose = findViewById(R.id.btnClose);
 
@@ -50,12 +52,11 @@ public class MainActivity extends AppCompatActivity {
                     if (!message.isEmpty()) { //If there is a message to send
                         (new WriteThread(message)).start(); //start thread to send message to robot
                     }
+                    etMessage.setText("");
                 } else {
                     Snackbar.make(findViewById(R.id.activity_main), "Please connect to the robot", Snackbar.LENGTH_LONG).show();
                 }
             }
-            etMessage.setText("");
-            etSensors.setText("");
         });
 
         btnClose.setOnClickListener(v -> closeConnection());
@@ -64,11 +65,13 @@ public class MainActivity extends AppCompatActivity {
         joystick.setOnMoveListener(new JoystickView.OnMoveListener() {
             @Override
             public void onMove(int angle, int strength) {
-                String message = angle + "," + strength;
+                String message = "S" + angle + "," + strength + "E";
                 if(toRobot != null) {
                     if(angle == 0 && strength == 0 && !joystickResting) { //joystick just returned to resting position. must tell robot to stop
-                        (new WriteThread(message)).start();
-                        joystickResting = true; //set resting flag
+                        joystickResting = true;
+                        for(int i = 0; i < 30; i++) {
+                            (new WriteThread(message)).start();
+                        }
                     } else if(angle != 0 || strength != 0) { //if joystick is not resting, send data
                         (new WriteThread(message)).start();
                         joystickResting = false;
@@ -132,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 read.start();
                 runOnUiThread(() -> {
                     btnSend.setText("SEND");
+                    etMessage.setText("");
                 });
                 connected = true;
             } catch (IOException e) {
@@ -149,10 +153,22 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     String message = fromRobot.readLine();
                     final String temp = message;
-                    if (!temp.equals("")) {
-                        runOnUiThread(() -> {
-                            etSensors.append(temp + '\n');
-                        });
+                    if(temp != null) {
+                        if (!temp.equals("")) {
+                            if (temp.startsWith("Bump")) {
+                                String[] split = temp.split(",");
+                                runOnUiThread(() -> {
+                                    etSensors.setText(split[0] + '\n');
+                                    etSensors.append(split[1] + '\n');
+                                    etSensors.append(split[2] + '\n');
+                                });
+                                Log.i("msg", "got" + temp);
+                            } else {
+                                runOnUiThread(() -> {
+                                    etSensors.append(temp + '\n');
+                                });
+                            }
+                        }
                     }
                 } catch (IOException e) {
                     Log.e("error", "reading from robot error");
