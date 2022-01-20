@@ -159,7 +159,6 @@ public class OpenGLES20Activity extends AppCompatActivity {
         toReturn[5] = Float.parseFloat(p[29]);
         return toReturn;
     }
-
     private class ReadThread extends Thread { //Gets input from robot
 
         @Override
