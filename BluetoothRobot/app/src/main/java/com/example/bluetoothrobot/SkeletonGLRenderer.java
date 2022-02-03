@@ -48,10 +48,10 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
         Matrix.setLookAtM(viewMatrix, 0, 0, 0, 3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
         Matrix.multiplyMM(vpMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
         lA.draw(vpMatrix);
-        //lL.draw(vpMatrix);
-        //rA.draw(vpMatrix);
-        //rL.draw(vpMatrix);
-        //spine.draw(vpMatrix);
+        lL.draw(vpMatrix);
+        rA.draw(vpMatrix);
+        rL.draw(vpMatrix);
+        spine.draw(vpMatrix);
     }
 
     @Override

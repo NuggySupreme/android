@@ -33,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private Button btnSend;
 
     @Override
+    protected boolean onTouchE
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

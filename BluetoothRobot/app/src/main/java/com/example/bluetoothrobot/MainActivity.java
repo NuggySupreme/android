@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     //UI Objects
     private EditText etMessage; //Input field to create message to send
     private SkeletonGLSurfaceView gLView;
+    //private TestView gLView;
     private final Handler customHandler = new Handler();
 
     //Bluetooth Objects
@@ -56,17 +57,19 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private boolean updating = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //create app
         super.onCreate(savedInstanceState);
-        gLView = new SkeletonGLSurfaceView(this);
+        //gLView = new SkeletonGLSurfaceView(this);
+        //gLView = new TestView(this);
 
         setContentView(R.layout.activity_main);
 
-        FrameLayout frm = (FrameLayout) findViewById(R.id.frame);
-        frm.setFocusable(true);
-        frm.addView(gLView);
+        //FrameLayout frm = (FrameLayout) findViewById(R.id.frame);
+        //frm.addView(gLView);
 
         //setup Bluetooth and register discovery filter
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -87,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Set click event listeners for buttons
         btnConnect.setOnClickListener(v -> {
-
             if (!btAdapter.isEnabled()) { //If bluetooth on the tablet is turned off, show a message to turn it on instead of crashing
                 Snackbar.make(findViewById(R.id.activity_main), "Please enable Bluetooth in the settings", Snackbar.LENGTH_LONG).show();
             } else {
@@ -133,13 +135,17 @@ public class MainActivity extends AppCompatActivity {
             Log.i("Info", "got bluetooth connection");
             (new ConnectThread()).start();
         }
-        gLView.onResume();
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        //gLView.onResume();
+    }
+    @Override
     protected void onPause() {
         super.onPause();
-        gLView.onPause();
+        //gLView.onPause();
     }
 
     @Override
@@ -280,9 +286,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             toRobot.write(message);
             toRobot.flush(); //send message over bluetooth to robot
-            runOnUiThread(() -> {
-                etMessage.setText("");
-            });
+            runOnUiThread(() -> etMessage.setText(""));
         }
     }
     private class ReadThread extends Thread { //Gets input from robot
@@ -292,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
             while(!isInterrupted()) {
                 try {
                     String message = fromRobot.readLine(); //get message from robot
-                    if (message.startsWith("DATA:")) { //if the message is not empt
+                    if (message.startsWith("DATA:") && !updating) { //if the message is not empt
                         message = message.substring(5);
                         String[] points = message.split(",");
 
@@ -337,10 +341,9 @@ public class MainActivity extends AppCompatActivity {
                                 maxVal[1] = Math.max(maxVal[1], spine[i + 1]);
                             }
                         }
-
-                        System.out.println(maxVal[0]);
-                        gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
+                        //gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
                         customHandler.postDelayed(this, 0);
+                        updating = false;
                     }
                 } catch (IOException e) {
                     Log.e("error", "reading from robot error");
