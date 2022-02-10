@@ -34,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     //UI Objects
     private EditText etMessage; //Input field to create message to send
-    private SkeletonGLSurfaceView gLView;
-    //private TestView gLView;
+    //private SkeletonGLSurfaceView gLView;
+    private TestView gLView;
     private final Handler customHandler = new Handler();
 
     //Bluetooth Objects
@@ -65,25 +65,21 @@ public class MainActivity extends AppCompatActivity {
         //create app
         super.onCreate(savedInstanceState);
         //gLView = new SkeletonGLSurfaceView(this);
-        //gLView = new TestView(this);
+        gLView = new TestView(this);
 
         setContentView(R.layout.activity_main);
 
-        FrameLayout frm1 = (FrameLayout) findViewById(R.id.skeletonFrame);
-        frm1.addView(gLView);
-        frm1.setBackgroundColor(Color.RED);
+        //FrameLayout frm1 = (FrameLayout) findViewById(R.id.skeletonFrame);
+        //frm1.addView(gLView);
 
-        FrameLayout frm2 = (FrameLayout) findViewById(R.id.chartFrame);
-        frm2.addView(gLView);
-        frm2.setBackgroundColor(Color.GREEN);
+       // FrameLayout frm2 = (FrameLayout) findViewById(R.id.chartFrame);
+        //frm2.addView(gLView);
 
         FrameLayout frm3 = (FrameLayout) findViewById(R.id.controlFrame);
-        frm3.addView(gLView);
-        frm3.setBackgroundColor(Color.YELLOW);
+        //frm3.addView(gLView);
 
         FrameLayout frm4 = (FrameLayout) findViewById(R.id.otherFrame);
-        frm4.addView(gLView);
-        frm4.setBackgroundColor(Color.BLUE);
+        //frm4.addView(gLView);
 
         //setup Bluetooth and register discovery filter
         btAdapter = BluetoothAdapter.getDefaultAdapter();

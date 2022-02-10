@@ -4,7 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Nathan/Documents/GitHub/android/BluetoothRobot/app/src/main/res/layout/activity_main.xml" value="0.152" />
-        <entry key="..\:/Users/lords/Documents/GitHub/android/BluetoothRobot/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/lords/Documents/GitHub/android/BluetoothRobot/app/src/main/res/layout/activity_main.xml" value="0.5" />
         <entry key="..\:/Users/lords/Documents/GitHub/android/BluetoothRobot/app/src/main/res/layout/activity_my_glsurface_view.xml" value="0.2630208333333333" />
         <entry key="..\:/Users/lords/Documents/GitHub/android/BluetoothRobot/app/src/main/res/layout/activity_open_gles2.xml" value="0.2630208333333333" />
         <entry key="..\:/Users/lords/Documents/GitHub/android/BluetoothRobot/app/src/main/res/layout/activity_open_gles20.xml" value="0.2630208333333333" />
@@ -17,5 +17,12 @@
   </component>
   <component name="ProjectType">
     <option name="id" value="Android" />
+  </component>
+  <component name="VisualizationToolProject">
+    <option name="state">
+      <ProjectState>
+        <option name="scale" value="0.36666666666666664" />
+      </ProjectState>
+    </option>
   </component>
 </project>
