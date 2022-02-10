@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -68,8 +69,21 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        //FrameLayout frm = (FrameLayout) findViewById(R.id.frame);
-        //frm.addView(gLView);
+        FrameLayout frm1 = (FrameLayout) findViewById(R.id.skeletonFrame);
+        frm1.addView(gLView);
+        frm1.setBackgroundColor(Color.RED);
+
+        FrameLayout frm2 = (FrameLayout) findViewById(R.id.chartFrame);
+        frm2.addView(gLView);
+        frm2.setBackgroundColor(Color.GREEN);
+
+        FrameLayout frm3 = (FrameLayout) findViewById(R.id.controlFrame);
+        frm3.addView(gLView);
+        frm3.setBackgroundColor(Color.YELLOW);
+
+        FrameLayout frm4 = (FrameLayout) findViewById(R.id.otherFrame);
+        frm4.addView(gLView);
+        frm4.setBackgroundColor(Color.BLUE);
 
         //setup Bluetooth and register discovery filter
         btAdapter = BluetoothAdapter.getDefaultAdapter();

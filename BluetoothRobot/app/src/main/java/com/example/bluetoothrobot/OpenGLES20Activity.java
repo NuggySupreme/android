@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class OpenGLES20Activity extends AppCompatActivity {
 
-    private ChartGLSurfaceView gLView;
+    private SkeletonGLSurfaceView gLView;
     private final Handler customHandler = new Handler();
 
     private UUID robotUUID = null; //UUID for the bluetooth connection itself. This is needed to fully connect to the robot over bluetooth
@@ -37,7 +37,7 @@ public class OpenGLES20Activity extends AppCompatActivity {
             robot = intent.getParcelableExtra("btDevice");
         }
 
-        gLView = new ChartGLSurfaceView(this);
+        gLView = new SkeletonGLSurfaceView(this);
         setContentView(gLView);
     }
 

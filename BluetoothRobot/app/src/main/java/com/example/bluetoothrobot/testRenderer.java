@@ -6,7 +6,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
-public class TestRenderer implements GLSurfaceView.Renderer {
+public class testRenderer implements GLSurfaceView.Renderer {
 
     private Square mSquare;
 

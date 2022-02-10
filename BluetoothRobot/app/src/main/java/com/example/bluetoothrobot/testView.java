@@ -5,7 +5,7 @@ import android.opengl.GLSurfaceView;
 
 class TestView extends GLSurfaceView {
 
-    private final TestRenderer renderer;
+    private final testRenderer renderer;
 
     public TestView(Context context){
         super(context);
@@ -13,7 +13,7 @@ class TestView extends GLSurfaceView {
         // Create an OpenGL ES 2.0 context
         setEGLContextClientVersion(2);
 
-        renderer = new TestRenderer();
+        renderer = new testRenderer();
 
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer);
