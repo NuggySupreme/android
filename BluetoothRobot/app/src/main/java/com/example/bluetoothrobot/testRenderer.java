@@ -5,15 +5,16 @@ import javax.microedition.khronos.opengles.GL10;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.SystemClock;
 
 public class testRenderer implements GLSurfaceView.Renderer {
 
     private Square mSquare;
-
+    public volatile float mAngle;
     private final float[] vPMatrix = new float[16];
     private final float[] projectionMatrix = new float[16];
     private final float[] viewMatrix = new float[16];
-
+    private float[] rotationMatrix = new float[16];
     public void onSurfaceCreated(GL10 unused, EGLConfig config) {
         // initialize a square
         mSquare = new Square();
@@ -24,13 +25,21 @@ public class testRenderer implements GLSurfaceView.Renderer {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+
+        float[] scratch = new float[16];
+        long time = SystemClock.uptimeMillis() % 1000L;
+        float angle = 0.090f * ((int) time);
+
         // Set the camera position (View matrix)
         Matrix.setLookAtM(viewMatrix, 0, 0, 0, 3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
 
         // Calculate the projection and view transformation
         Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
 
-        mSquare.draw(vPMatrix);
+        Matrix.setRotateM(rotationMatrix, 0, angle, 0, 0, -1.0f);
+        Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0);
+
+        mSquare.draw(scratch);
     }
 
     public void onSurfaceChanged(GL10 unused, int width, int height) {
@@ -53,6 +62,13 @@ public class testRenderer implements GLSurfaceView.Renderer {
         GLES20.glCompileShader(shader);
 
         return shader;
+    }
+
+    public float getAngle() {
+        return mAngle;
+    }
+    public void setAngle(float angle) {
+        mAngle = angle;
     }
 }
 
