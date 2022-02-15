@@ -21,7 +21,7 @@ public class SkeletonGLSurfaceView extends GLSurfaceView{
         // Set the Renderer for drawing on the GLSurfaceView
         skeletonRenderer = new SkeletonGLRenderer(context);
         setRenderer(skeletonRenderer);
-        setRenderMode(RENDERMODE_WHEN_DIRTY);
+        //setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
     public void setSkeletonData(float[] minVal, float[] maxVal, float[] la, float[] ll, float[] ra, float[] rl, float[] s) {

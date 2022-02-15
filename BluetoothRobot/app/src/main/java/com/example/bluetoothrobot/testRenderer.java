@@ -27,8 +27,6 @@ public class testRenderer implements GLSurfaceView.Renderer {
 
 
         float[] scratch = new float[16];
-        long time = SystemClock.uptimeMillis() % 1000L;
-        float angle = 0.090f * ((int) time);
 
         // Set the camera position (View matrix)
         Matrix.setLookAtM(viewMatrix, 0, 0, 0, 3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
@@ -36,7 +34,7 @@ public class testRenderer implements GLSurfaceView.Renderer {
         // Calculate the projection and view transformation
         Matrix.multiplyMM(vPMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
 
-        Matrix.setRotateM(rotationMatrix, 0, angle, 0, 0, -1.0f);
+        Matrix.setRotateM(rotationMatrix, 0, mAngle, 0, 0, -1.0f);
         Matrix.multiplyMM(scratch, 0, vPMatrix, 0, rotationMatrix, 0);
 
         mSquare.draw(scratch);
