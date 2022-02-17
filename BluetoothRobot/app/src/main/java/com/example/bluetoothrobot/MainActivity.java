@@ -183,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 2; i < 9; i++) {
             toReturn[j] = Float.parseFloat(p[3*i]);
             toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
+            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             if(i == 2) {
                 i += 3;
             }
@@ -197,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 5; i < 15; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
-            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
             if(i == 5) {
                 i += 6; //skip to joint 6
@@ -213,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 2; i < 12; i++) {
             toReturn[j] = Float.parseFloat(p[3*i]);
             toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
+            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             if(i == 2) {
                 i += 6;
             }
@@ -227,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 5; i < 18; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
-            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
             if(i == 5) {
                 i += 9; //skip to joint 6
@@ -242,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < 6; i++) {
             toReturn[3*i] = Float.parseFloat(p[3*i]);
             toReturn[3*i + 1] = Float.parseFloat(p[3*i + 1]);
+            toReturn[3*i + 2] = Float.parseFloat(p[3 * i + 2]);
         }
         return toReturn;
     }
@@ -313,30 +316,40 @@ public class MainActivity extends AppCompatActivity {
                                 maxVal[0] = Math.max(maxVal[0], lA[i]);
                                 minVal[1] = Math.min(minVal[1], lA[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], lA[i + 1]);
+                                minVal[2] = Math.min(minVal[2], lA[i + 2]);
+                                maxVal[2] = Math.max(maxVal[2], lA[i + 2]);
                             }
                             if(i < lL.length) {
                                 minVal[0] = Math.min(minVal[0], lL[i]);
                                 maxVal[0] = Math.max(maxVal[0], lL[i]);
                                 minVal[1] = Math.min(minVal[1], lL[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], lL[i + 1]);
+                                minVal[2] = Math.min(minVal[2], lL[i + 2]);
+                                maxVal[2] = Math.max(maxVal[2], lL[i + 2]);
                             }
                             if(i < rA.length) {
                                 minVal[0] = Math.min(minVal[0], rA[i]);
                                 maxVal[0] = Math.max(maxVal[0], rA[i]);
                                 minVal[1] = Math.min(minVal[1], rA[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], rA[i + 1]);
+                                minVal[2] = Math.min(minVal[2], rA[i + 2]);
+                                maxVal[2] = Math.max(maxVal[2], rA[i + 2]);
                             }
                             if(i < rL.length) {
                                 minVal[0] = Math.min(minVal[0], rL[i]);
                                 maxVal[0] = Math.max(maxVal[0], rL[i]);
                                 minVal[1] = Math.min(minVal[1], rL[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], rL[i + 1]);
+                                minVal[2] = Math.min(minVal[2], rL[i + 2]);
+                                maxVal[2] = Math.max(maxVal[2], rL[i + 2]);
                             }
                             if(i < spine.length) {
                                 minVal[0] = Math.min(minVal[0], spine[i]);
                                 maxVal[0] = Math.max(maxVal[0], spine[i]);
                                 minVal[1] = Math.min(minVal[1], spine[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], spine[i + 1]);
+                                minVal[2] = Math.min(minVal[2], spine[i + 2]);
+                                maxVal[2] = Math.max(maxVal[2], spine[i + 2]);
                             }
                         }
                         gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
