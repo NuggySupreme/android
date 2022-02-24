@@ -7,9 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,9 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     //UI Objects
     private EditText etMessage; //Input field to create message to send
-    //private SkeletonGLSurfaceView gLView;
-    private TestView gLView;
-    private final Handler customHandler = new Handler();
+    private SkeletonGLSurfaceView gLView;
+    //private TestView gLView;
 
     //Bluetooth Objects
     private UUID robotUUID = null; //UUID for the bluetooth connection itself. This is needed to fully connect to the robot over bluetooth
@@ -58,28 +55,17 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private boolean updating = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //create app
         super.onCreate(savedInstanceState);
-        //gLView = new SkeletonGLSurfaceView(this);
-        gLView = new TestView(this);
+        gLView = new SkeletonGLSurfaceView(this);
+        //gLView = new TestView(this);
 
         setContentView(R.layout.activity_main);
 
-        //FrameLayout frm1 = (FrameLayout) findViewById(R.id.skeletonFrame);
-        //frm1.addView(gLView);
-
-       // FrameLayout frm2 = (FrameLayout) findViewById(R.id.chartFrame);
-        //frm2.addView(gLView);
-
-        FrameLayout frm3 = (FrameLayout) findViewById(R.id.controlFrame);
-        //frm3.addView(gLView);
-
-        FrameLayout frm4 = (FrameLayout) findViewById(R.id.otherFrame);
-        //frm4.addView(gLView);
+        FrameLayout frm1 = findViewById(R.id.skeletonFrame);
+        frm1.addView(gLView);
 
         //setup Bluetooth and register discovery filter
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -150,12 +136,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //gLView.onResume();
+        gLView.onResume();
     }
     @Override
     protected void onPause() {
         super.onPause();
-        //gLView.onPause();
+        gLView.onPause();
     }
 
     @Override
@@ -195,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 2; i < 9; i++) {
             toReturn[j] = Float.parseFloat(p[3*i]);
             toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
-            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             if(i == 2) {
                 i += 3;
             }
@@ -210,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 5; i < 15; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
-            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
             if(i == 5) {
                 i += 6; //skip to joint 6
@@ -226,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 2; i < 12; i++) {
             toReturn[j] = Float.parseFloat(p[3*i]);
             toReturn[j + 1] = Float.parseFloat(p[3*i + 1]);
-            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+          //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             if(i == 2) {
                 i += 6;
             }
@@ -241,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 5; i < 18; i++) {
             toReturn[j] = Float.parseFloat(p[3 * i]);
             toReturn[j + 1] = Float.parseFloat(p[3 * i + 1]);
-            toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
+            //toReturn[j + 2] = Float.parseFloat(p[3 * i + 2]);
             j += 3;
             if(i == 5) {
                 i += 9; //skip to joint 6
@@ -256,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i < 6; i++) {
             toReturn[3*i] = Float.parseFloat(p[3*i]);
             toReturn[3*i + 1] = Float.parseFloat(p[3*i + 1]);
-            toReturn[3*i + 2] = Float.parseFloat(p[3 * i + 2]);
+            //toReturn[3*i + 2] = Float.parseFloat(p[3 * i + 2]);
         }
         return toReturn;
     }
@@ -309,7 +295,7 @@ public class MainActivity extends AppCompatActivity {
             while(!isInterrupted()) {
                 try {
                     String message = fromRobot.readLine(); //get message from robot
-                    if (message.startsWith("DATA:") && !updating) { //if the message is not empt
+                    if (message.startsWith("DATA:")) { //if the message is not empt
                         message = message.substring(5);
                         String[] points = message.split(",");
 
@@ -328,45 +314,43 @@ public class MainActivity extends AppCompatActivity {
                                 maxVal[0] = Math.max(maxVal[0], lA[i]);
                                 minVal[1] = Math.min(minVal[1], lA[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], lA[i + 1]);
-                                minVal[2] = Math.min(minVal[2], lA[i + 2]);
-                                maxVal[2] = Math.max(maxVal[2], lA[i + 2]);
+                                //minVal[2] = Math.min(minVal[2], lA[i + 2]);
+                                //maxVal[2] = Math.max(maxVal[2], lA[i + 2]);
                             }
                             if(i < lL.length) {
                                 minVal[0] = Math.min(minVal[0], lL[i]);
                                 maxVal[0] = Math.max(maxVal[0], lL[i]);
                                 minVal[1] = Math.min(minVal[1], lL[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], lL[i + 1]);
-                                minVal[2] = Math.min(minVal[2], lL[i + 2]);
-                                maxVal[2] = Math.max(maxVal[2], lL[i + 2]);
+                                //minVal[2] = Math.min(minVal[2], lL[i + 2]);
+                                //maxVal[2] = Math.max(maxVal[2], lL[i + 2]);
                             }
                             if(i < rA.length) {
                                 minVal[0] = Math.min(minVal[0], rA[i]);
                                 maxVal[0] = Math.max(maxVal[0], rA[i]);
                                 minVal[1] = Math.min(minVal[1], rA[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], rA[i + 1]);
-                                minVal[2] = Math.min(minVal[2], rA[i + 2]);
-                                maxVal[2] = Math.max(maxVal[2], rA[i + 2]);
+                                //minVal[2] = Math.min(minVal[2], rA[i + 2]);
+                                //maxVal[2] = Math.max(maxVal[2], rA[i + 2]);
                             }
                             if(i < rL.length) {
                                 minVal[0] = Math.min(minVal[0], rL[i]);
                                 maxVal[0] = Math.max(maxVal[0], rL[i]);
                                 minVal[1] = Math.min(minVal[1], rL[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], rL[i + 1]);
-                                minVal[2] = Math.min(minVal[2], rL[i + 2]);
-                                maxVal[2] = Math.max(maxVal[2], rL[i + 2]);
+                                //minVal[2] = Math.min(minVal[2], rL[i + 2]);
+                                //maxVal[2] = Math.max(maxVal[2], rL[i + 2]);
                             }
                             if(i < spine.length) {
                                 minVal[0] = Math.min(minVal[0], spine[i]);
                                 maxVal[0] = Math.max(maxVal[0], spine[i]);
                                 minVal[1] = Math.min(minVal[1], spine[i + 1]);
                                 maxVal[1] = Math.max(maxVal[1], spine[i + 1]);
-                                minVal[2] = Math.min(minVal[2], spine[i + 2]);
-                                maxVal[2] = Math.max(maxVal[2], spine[i + 2]);
+                                //minVal[2] = Math.min(minVal[2], spine[i + 2]);
+                                //maxVal[2] = Math.max(maxVal[2], spine[i + 2]);
                             }
                         }
-                        //gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
-                        customHandler.postDelayed(this, 0);
-                        updating = false;
+                        gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
                     }
                 } catch (IOException e) {
                     Log.e("error", "reading from robot error");
