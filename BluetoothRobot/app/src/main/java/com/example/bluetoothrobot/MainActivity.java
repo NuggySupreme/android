@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -33,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     //UI Objects
     private EditText etMessage; //Input field to create message to send
-    private SkeletonGLSurfaceView gLView;
-    //private TestView gLView;
+    //private SkeletonGLSurfaceView gLView;
+    private TestView gLView;
     private final Handler customHandler = new Handler();
 
     //Bluetooth Objects
@@ -57,17 +58,28 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private boolean updating = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //create app
         super.onCreate(savedInstanceState);
-        gLView = new SkeletonGLSurfaceView(this);
-        //gLView = new TestView(this);
+        //gLView = new SkeletonGLSurfaceView(this);
+        gLView = new TestView(this);
 
         setContentView(R.layout.activity_main);
 
-        FrameLayout frm1 = findViewById(R.id.skeletonFrame);
-        frm1.addView(gLView);
+        //FrameLayout frm1 = (FrameLayout) findViewById(R.id.skeletonFrame);
+        //frm1.addView(gLView);
+
+       // FrameLayout frm2 = (FrameLayout) findViewById(R.id.chartFrame);
+        //frm2.addView(gLView);
+
+        FrameLayout frm3 = (FrameLayout) findViewById(R.id.controlFrame);
+        //frm3.addView(gLView);
+
+        FrameLayout frm4 = (FrameLayout) findViewById(R.id.otherFrame);
+        //frm4.addView(gLView);
 
         //setup Bluetooth and register discovery filter
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -296,10 +308,10 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             while(!isInterrupted()) {
                 try {
-                    StringBuilder message = new StringBuilder(fromRobot.readLine()); //get message from robot
-                    if (message.toString().startsWith("DATA:")) { //if the message is not empty
-                        Log.e("MSG", message.toString());
-                        String[] points = message.substring(5).split(",");
+                    String message = fromRobot.readLine(); //get message from robot
+                    if (message.startsWith("DATA:") && !updating) { //if the message is not empt
+                        message = message.substring(5);
+                        String[] points = message.split(",");
 
                         float[] lA = createLeftArm(points);
                         float[] lL = createLeftLeg(points);
@@ -352,7 +364,9 @@ public class MainActivity extends AppCompatActivity {
                                 maxVal[2] = Math.max(maxVal[2], spine[i + 2]);
                             }
                         }
-                        gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
+                        //gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
+                        customHandler.postDelayed(this, 0);
+                        updating = false;
                     }
                 } catch (IOException e) {
                     Log.e("error", "reading from robot error");
