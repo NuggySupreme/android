@@ -47,12 +47,11 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
         //float[] scratch = new float[16];
 
         //Autoscales the model to fit in the window if it is centered at the origin
-        Matrix.frustumM(projectionMatrix, 0, minX - (0.1f * Math.abs(cX)), maxX + (0.1f * Math.abs(cX)), minY - (0.1f * Math.abs(cY)), maxY + (0.1f * Math.abs(cY)), 3, 7);
-
+        //Matrix.frustumM(projectionMatrix, 0, minX - (0.1f * Math.abs(cX)), maxX + (0.1f * Math.abs(cX)), minY - (0.1f * Math.abs(cY)), maxY + (0.1f * Math.abs(cY)), 3, 7);
+        Matrix.orthoM(projectionMatrix, 0, minX - (0.1f * Math.abs(cX)), maxX + (0.1f * Math.abs(cX)), minY - (0.1f * Math.abs(cY)), maxY + (0.1f * Math.abs(cY)), 3, 7);
         //Create view and MVP matrix for drawing
         Matrix.setLookAtM(viewMatrix, 0, 0, 0, 3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
         Matrix.multiplyMM(vpMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
-
         //long time = SystemClock.uptimeMillis() % 4000L;
         //mAngle = 0.090f * ((int) time);
         //Matrix.setRotateM(rotationMatrix, 0, mAngle, 0, 0, -1.0f);
