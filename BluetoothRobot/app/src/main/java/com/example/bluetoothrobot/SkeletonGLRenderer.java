@@ -15,12 +15,14 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
     private Line rA;
     private Line rL;
     private Line spine;
-
+    private boolean changed = true;
     private final float[] vpMatrix = new float[16];
     private final float[] projectionMatrix = new float[16];
     private final float[] viewMatrix = new float[16];
-    //private float[] rotationMatrix = new float[16];
+    private float[] rotationMatrix = new float[16];
     //public volatile float mAngle;
+    float xAngle;
+    float yAngle;
     public float maxX = 1.0f;
     public float maxY = 1.0f;
     public float maxZ = 2.0f;
@@ -44,7 +46,7 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
         GLES30.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
 
-        //float[] scratch = new float[16];
+        float[] scratch = new float[16];
 
         //Autoscales the model to fit in the window if it is centered at the origin
         //Matrix.frustumM(projectionMatrix, 0, minX - (0.1f * Math.abs(cX)), maxX + (0.1f * Math.abs(cX)), minY - (0.1f * Math.abs(cY)), maxY + (0.1f * Math.abs(cY)), 3, 7);
@@ -52,11 +54,13 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
         //Create view and MVP matrix for drawing
         Matrix.setLookAtM(viewMatrix, 0, 0, 0, 3, 0f, 0f, 0f, 0f, 1.0f, 0.0f);
         Matrix.multiplyMM(vpMatrix, 0, projectionMatrix, 0, viewMatrix, 0);
-        //long time = SystemClock.uptimeMillis() % 4000L;
-        //mAngle = 0.090f * ((int) time);
-        //Matrix.setRotateM(rotationMatrix, 0, mAngle, 0, 0, -1.0f);
+
+        //DOES NOT WORK for some reason.
+        //Matrix.setRotateM(rotationMatrix, 0, yAngle, 1.0f, 0, 0);
+        //Matrix.setRotateM(rotationMatrix, 0, xAngle, 0, 1.0f, 0);
         //Matrix.multiplyMM(scratch, 0, vpMatrix, 0, rotationMatrix, 0);
 
+        //use lA.draw(scratch) to draw the left arm of the skeleton using the rotation matrix. the same applied to the other joints
         lA.draw(vpMatrix);
         lL.draw(vpMatrix);
         rA.draw(vpMatrix);
@@ -69,6 +73,7 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
         GLES30.glViewport(0, 0, width, height);
         float ratio = (float) width/height;
         Matrix.frustumM(projectionMatrix, 0, -ratio, ratio, -1, 1, 3, 7);
+        changed = true;
     }
 
     @Override
@@ -95,5 +100,20 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
         rA.setVertices(ra);
         rL.setVertices(rl);
         spine.setVertices(s);
+    }
+    public float getXAngle() {
+        return xAngle;
+    }
+
+    public void setXAngle(float angle) {
+        xAngle = angle;
+    }
+
+    public float getYAngle() {
+        return yAngle;
+    }
+
+    public void setYAngle(float angle) {
+        yAngle = angle;
     }
 }

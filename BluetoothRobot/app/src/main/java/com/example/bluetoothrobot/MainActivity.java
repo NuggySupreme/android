@@ -33,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
     //UI Objects
     private EditText etMessage; //Input field to create message to send
     private SkeletonGLSurfaceView gLView;
+    private ChartView chartView;
     //private TestView gLView;
 
     //Bluetooth Objects
@@ -61,11 +62,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         gLView = new SkeletonGLSurfaceView(this);
         //gLView = new TestView(this);
+        chartView = new ChartView(this);
 
         setContentView(R.layout.activity_main);
 
         FrameLayout frm1 = findViewById(R.id.skeletonFrame);
         frm1.addView(gLView);
+
+        FrameLayout frm2 = findViewById(R.id.chartFrame);
+        frm2.addView(chartView);
 
         //setup Bluetooth and register discovery filter
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -137,11 +142,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         gLView.onResume();
+        chartView.onResume();
     }
     @Override
     protected void onPause() {
         super.onPause();
         gLView.onPause();
+        chartView.onPause();
     }
 
     @Override
@@ -351,6 +358,9 @@ public class MainActivity extends AppCompatActivity {
                             }
                         }
                         gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
+                        gLView.requestRender();
+                        System.out.println("point to add: " + (maxVal[0] - minVal[0]));
+                        chartView.addVertex(maxVal[0]);
                     }
                 } catch (IOException e) {
                     Log.e("error", "reading from robot error");
