@@ -1,7 +1,0 @@
-<resources>
-    <string name="app_name">My Application</string>
-    <string name="message">Message</string>
-    <string name="send">CONNECT</string>
-    <string name="close">RESET</string>
-    <string name="connect">TEST</string>
-</resources>

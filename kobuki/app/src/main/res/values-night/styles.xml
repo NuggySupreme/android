@@ -1,9 +1,0 @@
-<resources>
-
-    <style name="Widget.Theme.MyApplication.MyView" parent="">
-        <item name="android:background">@color/gray_400</item>
-        <item name="android:textColor">@color/white</item>
-        <item name="android:textColorHighlight">@color/white</item>
-        <item name="exampleColor">@color/light_blue_600</item>
-    </style>
-</resources>
