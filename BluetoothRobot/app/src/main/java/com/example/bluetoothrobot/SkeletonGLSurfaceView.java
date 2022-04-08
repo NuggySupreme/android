@@ -13,6 +13,8 @@ public class SkeletonGLSurfaceView extends GLSurfaceView{
     private final float TOUCH_SCALE_FACTOR = 180.0f / 320;
     private float previousX;
     private float previousY;
+
+    /* enables touch events to rotate the skeleton
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         // MotionEvent reports input details from the touch screen
@@ -50,7 +52,7 @@ public class SkeletonGLSurfaceView extends GLSurfaceView{
         previousX = x;
         previousY = y;
         return true;
-    }
+    } */
 
     public SkeletonGLSurfaceView(Context context) {
         super(context);

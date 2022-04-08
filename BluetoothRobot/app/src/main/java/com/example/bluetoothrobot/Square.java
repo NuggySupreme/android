@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 import android.opengl.GLES20;
 
+//Code for OpenGL square
 public class Square {
     private final String vertexShaderCode =
             // This matrix member variable provides a hook to manipulate

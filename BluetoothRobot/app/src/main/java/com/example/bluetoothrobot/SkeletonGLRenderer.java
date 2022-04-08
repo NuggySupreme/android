@@ -101,19 +101,4 @@ public class SkeletonGLRenderer implements GLSurfaceView.Renderer {
         rL.setVertices(rl);
         spine.setVertices(s);
     }
-    public float getXAngle() {
-        return xAngle;
-    }
-
-    public void setXAngle(float angle) {
-        xAngle = angle;
-    }
-
-    public float getYAngle() {
-        return yAngle;
-    }
-
-    public void setYAngle(float angle) {
-        yAngle = angle;
-    }
 }

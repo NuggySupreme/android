@@ -34,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
     private EditText etMessage; //Input field to create message to send
     private SkeletonGLSurfaceView gLView;
     private ChartView chartView;
-    //private TestView gLView;
+    private RobotControlView controlView;
+    private OtherView otherView;
+
+    //private TestView gLView; //testing view to test different portions of OpenGL code without messing up the skeleton
 
     //Bluetooth Objects
     private UUID robotUUID = null; //UUID for the bluetooth connection itself. This is needed to fully connect to the robot over bluetooth
@@ -61,8 +64,10 @@ public class MainActivity extends AppCompatActivity {
         //create app
         super.onCreate(savedInstanceState);
         gLView = new SkeletonGLSurfaceView(this);
-        //gLView = new TestView(this);
+        //gLView = new TestView(this); //when you want to change the skeleton portion of the screen to testing mode
         chartView = new ChartView(this);
+        //controlView = new RobotControlView(this);
+        //otherView = new OtherView(this);
 
         setContentView(R.layout.activity_main);
 
@@ -71,6 +76,12 @@ public class MainActivity extends AppCompatActivity {
 
         FrameLayout frm2 = findViewById(R.id.chartFrame);
         frm2.addView(chartView);
+
+        //FrameLayout frm3 = findViewById(R.id.controlFrame);
+        //frm3.addView(controlView);
+
+        //FrameLayout frm4 = findViewById(R.id.otherFrame);
+        //frm4.addView(otherView);
 
         //setup Bluetooth and register discovery filter
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -181,6 +192,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static int max(int a, int b, int c, int d, int e) {
+        int max = a;
+        max = Math.max(max, b);
+        max = Math.max(max, c);
+        max = Math.max(max, d);
+        max = Math.max(max, e);
+        return max;
+    }
+
+    /* ALL SKELETON POINTS ARE IN THE FORM (X, Y, Z) so toReturn[i] = X, toReturn[i + 1] = Y, toReturn[i+2] = Z. */
+    /* The point order is determined by the message from ROS being sent. Check skeleton_format.pys in ros_bluetooth to change the order*/
     private float[] createLeftArm(String[] p) {
         float[] toReturn = new float[12];
 
@@ -252,15 +274,6 @@ public class MainActivity extends AppCompatActivity {
             //toReturn[3*i + 2] = Float.parseFloat(p[3 * i + 2]);
         }
         return toReturn;
-    }
-
-    public static int max(int a, int b, int c, int d, int e) {
-        int max = a;
-        max = Math.max(max, b);
-        max = Math.max(max, c);
-        max = Math.max(max, d);
-        max = Math.max(max, e);
-        return max;
     }
 
     private class ConnectThread extends Thread { //Sends a bluetooth connection to the robot
@@ -359,8 +372,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         gLView.setSkeletonData(minVal, maxVal, lA, lL, rA, rL, spine);
                         gLView.requestRender();
-                        System.out.println("point to add: " + (maxVal[0] - minVal[0]));
-                        chartView.addVertex(maxVal[0]);
+                        chartView.addVertex((maxVal[0]-minVal[0]));
                     }
                 } catch (IOException e) {
                     Log.e("error", "reading from robot error");
